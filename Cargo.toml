@@ -3,4 +3,13 @@ name = "nuktah"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "nuktah"
+path = "src/lib.rs"
+
+[[bin]]
+name = "nuktahc"
+path = "src/main.rs"
+
 [dependencies]
+regex = "1.11.1"
