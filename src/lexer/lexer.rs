@@ -171,7 +171,7 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
         "while" => return Ok(Token::While),
         "if" => return Ok(Token::If),
         "else" => return Ok(Token::Else),
-        "elif" => return Ok(Token::Else),
+        "elif" => return Ok(Token::ElseIf),
         "ret" => return Ok(Token::Return),
 
         "TRUE" => return Ok(Token::BooleanLit(true)),
