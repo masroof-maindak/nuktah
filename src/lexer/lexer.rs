@@ -1,6 +1,6 @@
 const DELIM: &str = "(){}[]`;=\r\n\t\"\' ";
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Token {
     // for, while
     For,
@@ -49,9 +49,6 @@ pub enum Token {
     EqualsOp,
 }
 
-/// Fuck me, I spent way too long before realising the strtok approach probably won't work
-/// because of `++` and company, i.e cases where a delimiter itself is part of a token
-
 fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
     let tmp = &src[*idx..];
     let mut delim_offset = std::usize::MAX;
@@ -82,6 +79,27 @@ fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
     return &tmp[..delim_offset];
 }
 
+fn consolidate_tokens(token_list: &mut Vec<Token>, t: &mut Token) {
+    if token_list.len() == 0
+        || *t != Token::AddOp
+        || *t != Token::MulOp
+        || *t != Token::SubOp
+        || *t != Token::Whitespace
+    {
+        return;
+    }
+
+    let last_token = token_list.last().unwrap();
+
+    if *last_token == *t {
+        token_list.pop();
+        *t = match *t {
+            Token::AddOp => Token::IncementOp,
+            Token::SubOp => Token::DecrementOp,
+            Token::MulOp => Token::ExpOp,
+            _ => return,
+        }
+    }
 }
 
 pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
@@ -90,8 +108,9 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
 
     while idx < src.len() {
         let word = strtok(src, DELIM, &mut idx);
-        let t = identify_token(word)?;
-        token_list.push(t)
+        let mut t = identify_token(word)?;
+        consolidate_tokens(&mut token_list, &mut t);
+        token_list.push(t);
     }
 
     Ok(token_list)
