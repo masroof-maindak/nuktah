@@ -2,11 +2,12 @@ const DELIM: &str = " \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~";
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
-    // for, while
+    // for, while, if, else, elif, ret
     For,
     While,
     If,
     Else,
+    ElseIf,
     Return,
 
     // int, str, char, float, bool, fn
@@ -17,7 +18,7 @@ pub enum Token {
     Bool,
     Function,
 
-    // (), {}, [], `, ", ', , ;, \
+    // (), {}, [], `, ", '
     ParenL,
     ParenR,
     BraceL,
@@ -28,15 +29,15 @@ pub enum Token {
     Quotes,
     Quote,
 
+    //  , :, ;
+    Whitespace,
     Colon,
     Semicolon,
-    Backslash,
-    Whitespace,
 
-    // main, foo, bar, baz
+    // main, foo, bar, baz, etc
     Identifier(String),
 
-    // 33, `hello world!`, 5.1, true, false
+    // 33, `hello world!`, 5.1, TRUE, FALSE
     IntLit(i64),
     StringLit(String),
     FloatLit(f64),
@@ -152,14 +153,12 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
         "`" => return Ok(Token::Backtick),
         "\'" => return Ok(Token::Quote),
 
-        ":" => return Ok(Token::Colon),
-        ";" => return Ok(Token::Semicolon),
-        "\\" => return Ok(Token::Backslash),
-
         " " => return Ok(Token::Whitespace),
         "\n" => return Ok(Token::Whitespace),
         "\t" => return Ok(Token::Whitespace),
         "\r" => return Ok(Token::Whitespace),
+        ":" => return Ok(Token::Colon),
+        ";" => return Ok(Token::Semicolon),
 
         "int" => return Ok(Token::Int),
         "float" => return Ok(Token::Float),
@@ -172,7 +171,8 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
         "while" => return Ok(Token::While),
         "if" => return Ok(Token::If),
         "else" => return Ok(Token::Else),
-        "return" => return Ok(Token::Return),
+        "elif" => return Ok(Token::Else),
+        "ret" => return Ok(Token::Return),
 
         "TRUE" => return Ok(Token::BooleanLit(true)),
         "FALSE" => return Ok(Token::BooleanLit(false)),
