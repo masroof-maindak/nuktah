@@ -1,4 +1,4 @@
-const DELIM: &str = "(){}[]`\"\'; \n\t=";
+const DELIM: &str = "(){}[]`;=\r\n\t\"\' ";
 
 #[derive(Debug)]
 pub enum Token {
@@ -53,32 +53,35 @@ pub enum Token {
 /// because of `++` and company, i.e cases where a delimiter itself is part of a token
 
 fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
-    // Remove whitespaces
     let tmp = &src[*idx..];
+    let mut delim_offset = std::usize::MAX;
 
-    // Find earliest delimiter's index
-    let mut smallest_idx = std::usize::MAX;
-
-    for d in delims.chars() {
-        if let Some(i) = tmp.find(d) {
-            smallest_idx = std::cmp::min(i, smallest_idx);
+    for c in delims.chars() {
+        match tmp.find(c) {
+            Some(i) => {
+                delim_offset = std::cmp::min(delim_offset, i);
+                if delim_offset == 0 {
+                    break;
+                }
+            }
+            None => continue,
         }
     }
 
-    // not found
-    if smallest_idx == std::usize::MAX {
-        *idx = smallest_idx;
-        return tmp;
-
-    // i.e delimiter on first idx
-    } else if smallest_idx == 0 {
+    if delim_offset == 0 {
         *idx += 1;
         return &tmp[0..1];
     }
 
-    // Else, return from the current point up till the index
-    *idx = smallest_idx;
-    return &tmp[..smallest_idx];
+    if delim_offset == std::usize::MAX {
+        *idx = delim_offset;
+        return tmp;
+    }
+
+    *idx += delim_offset;
+    return &tmp[..delim_offset];
+}
+
 }
 
 pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
