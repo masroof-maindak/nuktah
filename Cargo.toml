@@ -10,6 +10,3 @@ path = "src/lib.rs"
 [[bin]]
 name = "nktc"
 path = "src/main.rs"
-
-[dependencies]
-regex = "1.11.1"
