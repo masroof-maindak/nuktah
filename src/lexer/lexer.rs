@@ -1,4 +1,4 @@
-const DELIM: &str = "(){}[]`;=\r\n\t\"\' ";
+const DELIM: &str = " \r\n\t\"\';=(){}[]`";
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
@@ -12,19 +12,16 @@ pub enum Token {
     Float,
     Function,
 
-    // (), {}, [], ``, "", '', ;
+    // (), {}, [], `, ", ', , ;
     ParenL,
     ParenR,
     BraceL,
     BraceR,
     BracketL,
     BracketR,
-    BacktickL,
-    BacktickR,
-    QuotesL,
-    QuotesR,
-    QuoteL,
-    QuoteR,
+    Backtick,
+    Quotes,
+    Quote,
     Semicolon,
     Whitespace,
 
@@ -47,6 +44,20 @@ pub enum Token {
     IncementOp,
     DecrementOp,
     EqualsOp,
+}
+
+pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
+    let mut token_list: Vec<Token> = Vec::new();
+    let mut idx = 0;
+
+    while idx < src.len() {
+        let word = strtok(src, DELIM, &mut idx);
+        let mut t = identify_token(word)?;
+        consolidate_tokens(&mut token_list, &mut t);
+        token_list.push(t);
+    }
+
+    Ok(token_list)
 }
 
 fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
@@ -79,11 +90,18 @@ fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
     return &tmp[..delim_offset];
 }
 
+fn identify_token(_word: &str) -> Result<Token, &'static str> {
+    // Start matching every regex string with extracted word/character
+    // Select the largest matching && highest priority string
+    // check for conflict/'ambiguity' -> error out or resolve
+    Ok(Token::IntLit(24545))
+}
+
 fn consolidate_tokens(token_list: &mut Vec<Token>, t: &mut Token) {
     if token_list.len() == 0
         || *t != Token::AddOp
-        || *t != Token::MulOp
         || *t != Token::SubOp
+        || *t != Token::AssignOp
         || *t != Token::Whitespace
     {
         return;
@@ -96,29 +114,8 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, t: &mut Token) {
         *t = match *t {
             Token::AddOp => Token::IncementOp,
             Token::SubOp => Token::DecrementOp,
-            Token::MulOp => Token::ExpOp,
+            Token::AssignOp => Token::EqualsOp,
             _ => return,
         }
     }
-}
-
-pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
-    let mut token_list: Vec<Token> = Vec::new();
-    let mut idx = 0;
-
-    while idx < src.len() {
-        let word = strtok(src, DELIM, &mut idx);
-        let mut t = identify_token(word)?;
-        consolidate_tokens(&mut token_list, &mut t);
-        token_list.push(t);
-    }
-
-    Ok(token_list)
-}
-
-fn identify_token(_word: &str) -> Result<Token, &'static str> {
-    // Start matching every regex string with extracted word/character
-    // Select the largest matching && highest priority string
-    // check for conflict/'ambiguity' -> error out or resolve
-    Ok(Token::IntLit(24545))
 }
