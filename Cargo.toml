@@ -8,7 +8,7 @@ name = "nuktah"
 path = "src/lib.rs"
 
 [[bin]]
-name = "nuktahc"
+name = "nktc"
 path = "src/main.rs"
 
 [dependencies]
