@@ -1,4 +1,4 @@
-const DELIM: &str = " \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~";
+const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~";
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
@@ -89,34 +89,26 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
     Ok(token_list)
 }
 
-fn strtok<'a>(src: &'a String, delims: &str, idx: &mut usize) -> &'a str {
-    let tmp = &src[*idx..];
-    let mut delim_offset = std::usize::MAX;
-
-    for c in delims.chars() {
-        match tmp.find(c) {
-            Some(i) => {
-                delim_offset = std::cmp::min(delim_offset, i);
-                if delim_offset == 0 {
-                    break;
-                }
-            }
-            None => continue,
-        }
-    }
+fn strtok<'a>(src: &'a String, delims: &[u8], idx: &mut usize) -> &'a str {
+    let remaining_text = &src[*idx..];
+    let (delim_offset, _) = remaining_text
+        .bytes()
+        .enumerate()
+        .find(|(_, c)| delims.contains(c))
+        .unwrap_or_else(|| (std::usize::MAX, b'~'));
 
     if delim_offset == 0 {
         *idx += 1;
-        return &tmp[0..1];
+        return &remaining_text[0..1];
     }
 
     if delim_offset == std::usize::MAX {
         *idx = delim_offset;
-        return tmp;
+        return remaining_text;
     }
 
     *idx += delim_offset;
-    return &tmp[..delim_offset];
+    return &remaining_text[..delim_offset];
 }
 
 fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static str> {
