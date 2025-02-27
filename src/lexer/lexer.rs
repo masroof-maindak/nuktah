@@ -1,4 +1,4 @@
-const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~";
+const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,";
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
