@@ -29,8 +29,10 @@ pub enum Token {
 
     //  , :, ;
     Whitespace,
+    Newline,
     Colon,
     Semicolon,
+    Comment,
 
     // main, foo, bar, baz, etc
     Identifier(String),

@@ -1,6 +1,6 @@
 use crate::lexer::token::Token;
 
-const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,";
+const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 
 pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
     let mut token_list: Vec<Token> = Vec::new();
@@ -78,11 +78,12 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
         "\'" => return Ok(Token::Quote),
 
         " " => return Ok(Token::Whitespace),
-        "\n" => return Ok(Token::Whitespace),
+        "\n" => return Ok(Token::Newline),
         "\t" => return Ok(Token::Whitespace),
         "\r" => return Ok(Token::Whitespace),
         ":" => return Ok(Token::Colon),
         ";" => return Ok(Token::Semicolon),
+        "$" => return Ok(Token::Comment),
 
         "=" => return Ok(Token::AssignOp),
         "+" => return Ok(Token::AddOp),
