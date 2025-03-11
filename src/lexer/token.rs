@@ -1,19 +1,15 @@
 #[derive(Debug, PartialEq)]
 pub enum Token {
-    // for, while, if, else, elif, ret
+    // for, if, else, elif, ret
     For,
-    While,
     If,
     Else,
-    ElseIf,
     Return,
 
-    // int, str, char, float, bool, fn
+    // int, str, float, fn
     Int,
     String,
-    Char, // CHECK: how to handle char literals?
     Float,
-    Bool,
     Function,
 
     // (), {}, [], `, ", '
@@ -41,9 +37,8 @@ pub enum Token {
     IntLit(i64),
     StringLit(String),
     FloatLit(f64),
-    BooleanLit(bool),
 
-    // =, +, -, *, /, %, ^, ++, --, ==
+    // =, +, -, *, /, %, ^, ==
     AssignOp,
     AddOp,
     SubOp,
@@ -51,8 +46,6 @@ pub enum Token {
     DivOp,
     ModOp,
     ExpOp,
-    IncrementOp,
-    DecrementOp,
     EqualsOp,
 
     // ., ,, !, &, |, &&, ||, ~, <, >, <<, >>

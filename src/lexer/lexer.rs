@@ -55,17 +55,13 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
 
     match word {
         "for" => return Ok(Token::For),
-        "while" => return Ok(Token::While),
         "if" => return Ok(Token::If),
         "else" => return Ok(Token::Else),
-        "elif" => return Ok(Token::ElseIf),
         "ret" => return Ok(Token::Return),
 
         "int" => return Ok(Token::Int),
         "float" => return Ok(Token::Float),
-        "char" => return Ok(Token::Char),
         "string" => return Ok(Token::String),
-        "bool" => return Ok(Token::Bool),
         "fn" => return Ok(Token::Function),
 
         "(" => return Ok(Token::ParenL),
@@ -101,9 +97,6 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static st
         "~" => return Ok(Token::BitwiseNot),
         "<" => return Ok(Token::LessThan),
         ">" => return Ok(Token::GreaterThan),
-
-        "TRUE" => return Ok(Token::BooleanLit(true)),
-        "FALSE" => return Ok(Token::BooleanLit(false)),
 
         _ => {
             if let Ok(n) = word.parse::<i64>() {
@@ -158,8 +151,6 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, t: &mut Token, quotes_started
         }
 
         *t = match *t {
-            Token::AddOp => Token::IncrementOp,
-            Token::SubOp => Token::DecrementOp,
             Token::AssignOp => Token::EqualsOp,
             Token::LessThan => Token::ShiftLeft,
             Token::GreaterThan => Token::ShiftRight,
