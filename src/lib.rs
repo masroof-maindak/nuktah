@@ -12,7 +12,9 @@ pub fn compile_src(src_code: &mut String) -> Result<(), &'static str> {
 
     println!("{:?}", tokens);
 
-    let _ = parser::parser::parse_token_list(tokens);
+    let ast = parser::parser::parse_token_list(tokens);
+
+    println!("{:?}", ast);
 
     Ok(())
 }
