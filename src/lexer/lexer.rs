@@ -2,7 +2,10 @@ use crate::lexer::token::Token;
 
 const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 
-pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, &'static str> {
+#[derive(Debug)]
+pub enum LexerError {}
+
+pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
     let mut token_list: Vec<Token> = Vec::new();
     let mut idx = 0;
     let mut quotes_started = false;
@@ -44,7 +47,7 @@ fn strtok<'a>(src: &'a String, delims: &[u8], idx: &mut usize) -> &'a str {
     return &remaining_text[..delim_offset];
 }
 
-fn identify_token(word: &str, quotes_started: bool) -> Result<Token, &'static str> {
+fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError> {
     if word == "\"" {
         return Ok(Token::Quotes);
     }

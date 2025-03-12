@@ -20,7 +20,7 @@ fn main() -> std::io::Result<()> {
         }
 
         Err(e) => {
-            eprintln!("{e}");
+            eprintln!("{:?}", e);
             std::process::exit(1)
         }
     };
