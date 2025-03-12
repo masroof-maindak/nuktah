@@ -1,232 +1,228 @@
 use crate::lexer::token::Token;
 
-enum AstNode {
-    // every single type of node
-    // initialize w/ root node of type CompUnit
+#[derive(Debug)]
+pub enum AstNode {
+    TranslationUnitNode(TranslationUnitNode),
 }
 
-pub struct TranslationUnit {
-    pub dl: DeclList,
+pub type TranslationUnitNode = DeclListNode;
+
+pub type DeclListNode = Vec<DeclNode>;
+
+#[derive(Debug)]
+pub enum DeclNode {
+    VarDeclNode(VarDeclNode),
+    FnDeclNode(FnDeclNode),
 }
 
-pub struct DeclList {
-    pub d: Vec<Decl>,
-}
-
-pub struct Decl {
-    pub vd: VarDecl,
-    pub fd: FnDecl,
-}
-
-pub struct VarDecl {
-    pub t: Type,
+#[derive(Debug)]
+pub struct VarDeclNode {
+    pub t: TypeNode,
     pub i: Token, // Identifier,
     pub a: Token, // AssignOp,
-    pub e: Expr,
-    pub s: Token, // Semicolon,
+    pub e: ExprStmtNode,
 }
-pub type VarDeclNode = (TypeNode, Token, ExprNode, Token, Token);
 
 // parse function will shrimply match and predict variables
 // composed within that struct and returns a result<node,parseerror> of that struct's type
 
-pub struct FnDecl {
-    pub t: Type,
-    pub i: Token, // Identifier,
-    pub a: Token, // ParenL,
-    pub e: Params,
-    pub s: Token, // ParenR,
-    pub b: Block,
+#[derive(Debug)]
+pub struct FnDeclNode {
+    pub f: Token, // Func
+    pub t: TypeNode,
+    pub i: Token,  // Identifier,
+    pub pl: Token, // ParenL,
+    pub p: ParamsNode,
+    pub pr: Token, // ParenR,
+    pub b: BlockNode,
 }
 
 pub struct Type {
     pub t: Token, // {Int,String,/Float}Lit
 }
-type TypeNode = Token;
+pub type TypeNode = Token;
 
-pub enum Params {
-    Single(Param),
-    Multiple(
-        Param,
-        Token, // Comma
-        Box<Params>,
-    ),
-    None,
-}
-
-pub struct Param {
-    pub t: Type,
+pub type ParamsNode = Vec<ParamNode>;
+#[derive(Debug)]
+pub struct ParamNode {
+    pub t: TypeNode,
     pub i: Token, // Identifier
 }
 
-pub struct Block {
+#[derive(Debug)]
+pub struct BlockNode {
     pub l: Token, // BraceL
-    pub s: Stmts,
+    pub s: StmtsNode,
     pub r: Token, // BraceR
 }
 
-pub struct Stmts {
-    pub s: Vec<Stmt>,
+pub type StmtsNode = Vec<StmtNode>;
+
+#[derive(Debug)]
+pub enum StmtNode {
+    For(ForStmtNode),
+    If(IfStmtNode),
+    Ret(RetStmtNode),
+    VarDecl(VarDeclNode),
+    ExprStmtNode(ExprStmtNode),
 }
 
-pub enum Stmt {
-    For(ForStmt),
-    If(IfStmt),
-    Ret(RetStmt),
-    Var(VarDecl),
-    Expr(ExprStmt),
-}
-
-pub struct ForStmt {
+#[derive(Debug)]
+pub struct ForStmtNode {
     pub f: Token,  // For
     pub pl: Token, // ParenL
-    pub init: ExprStmt,
-    pub cond: ExprStmt,
-    pub inc: Expr,
+    pub init: ExprStmtNode,
+    pub cond: ExprStmtNode,
+    pub inc: ExprNode,
     pub pr: Token, // ParenR
-    pub b: Block,
+    pub b: BlockNode,
 }
 
-pub struct IfStmt {
+#[derive(Debug)]
+pub struct IfStmtNode {
     pub i: Token,  // If
     pub pl: Token, // ParenL
-    pub e: Expr,
+    pub e: ExprNode,
     pub pr: Token, // ParenR
-    pub ib: Block,
+    pub ib: BlockNode,
     pub el: Token, // Else
-    pub eb: Block,
+    pub eb: BlockNode,
 }
 
-pub struct RetStmt {
+#[derive(Debug)]
+pub struct RetStmtNode {
     pub r: Token, // Ret
-    pub e: Option<Expr>,
+    pub e: ExprNode,
     pub s: Token, // Semicolon
 }
 
-pub struct ExprStmt {
-    pub e: Expr,
+#[derive(Debug)]
+pub struct ExprStmtNode {
+    pub e: ExprNode,
     pub s: Token, // Semicolon,
 }
 
-pub struct Expr {
-    pub ae: AssignExpr,
-}
+pub type ExprNode = AssignExprNode;
 
-pub enum AssignExpr {
-    BitwiseOr(BitwiseOrExpr),
+#[derive(Debug)]
+pub enum AssignExprNode {
+    BitwiseOr(BitwiseOrExprNode),
     Assign(
-        Box<AssignExpr>,
+        Box<AssignExprNode>,
         Token, // AssignOp
-        BitwiseOrExpr,
+        BitwiseOrExprNode,
     ),
 }
 
-pub enum BitwiseOrExpr {
-    BitwiseAnd(BitwiseAndExpr),
+#[derive(Debug)]
+pub enum BitwiseOrExprNode {
+    BitwiseAnd(BitwiseAndExprNode),
     BitwiseOr(
-        Box<BitwiseOrExpr>,
+        Box<BitwiseOrExprNode>,
         Token, // BitwiseOr
-        BitwiseAndExpr,
+        BitwiseAndExprNode,
     ),
 }
 
-pub enum BitwiseAndExpr {
-    Bool(BoolExpr),
+#[derive(Debug)]
+pub enum BitwiseAndExprNode {
+    Bool(BoolExprNode),
     BitwiseAnd(
-        Box<BitwiseAndExpr>,
+        Box<BitwiseAndExprNode>,
         Token, // BitwiseAnd
-        BoolExpr,
+        BoolExprNode,
     ),
 }
 
-pub enum BoolExpr {
-    Comp(CompExpr),
+#[derive(Debug)]
+pub enum BoolExprNode {
+    Comp(CompExprNode),
     Bool(
-        Box<BoolExpr>,
+        Box<BoolExprNode>,
         Token, // Boolean{And,Or}
-        CompExpr,
+        CompExprNode,
     ),
 }
 
-pub enum CompExpr {
-    Shift(ShiftExpr),
+#[derive(Debug)]
+pub enum CompExprNode {
+    Shift(ShiftExprNode),
     Comp(
-        Box<CompExpr>,
+        Box<CompExprNode>,
         Token, // {Greater,Less}Than, Equals
-        ShiftExpr,
+        ShiftExprNode,
     ),
 }
 
-pub enum ShiftExpr {
-    Add(AddExpr),
+#[derive(Debug)]
+pub enum ShiftExprNode {
+    Add(AddExprNode),
     Shift(
-        Box<ShiftExpr>,
+        Box<ShiftExprNode>,
         Token, // Shift{Left,Right}
-        AddExpr,
+        AddExprNode,
     ),
 }
 
-pub enum AddExpr {
-    Mul(MulExpr),
+#[derive(Debug)]
+pub enum AddExprNode {
+    Mul(MulExprNode),
     Add(
-        Box<AddExpr>,
+        Box<AddExprNode>,
         Token, // {Add,Sub}Op
-        MulExpr,
+        MulExprNode,
     ),
 }
 
-pub enum MulExpr {
-    Unary(ExpExpr),
+#[derive(Debug)]
+pub enum MulExprNode {
+    Unary(ExpExprNode),
     Mul(
-        Box<MulExpr>,
+        Box<MulExprNode>,
         Token, // {Mul,Div,Mod}Op
-        ExpExpr,
+        ExpExprNode,
     ),
 }
 
-pub enum ExpExpr {
-    Unary(UnaryExpr),
+#[derive(Debug)]
+pub enum ExpExprNode {
+    Unary(UnaryExprNode),
     Exp(
-        Box<ExpExpr>,
+        Box<ExpExprNode>,
         Token, // ExpOp
-        UnaryExpr,
+        UnaryExprNode,
     ),
 }
 
-pub enum UnaryExpr {
-    Primary(PrimaryExpr),
+#[derive(Debug)]
+pub enum UnaryExprNode {
+    Primary(PrimaryExprNode),
     Unary(
         Token, // SubOp,{Boolean,Bitwise}Not
-        Box<UnaryExpr>,
+        Box<UnaryExprNode>,
     ),
 }
 
-pub enum PrimaryExpr {
+#[derive(Debug)]
+pub enum PrimaryExprNode {
     IntLit(Token),
     FloatLit(Token),
     StringLit(Token),
     Ident(Token),
     Paren(
         Token, // ParenL
-        Box<Expr>,
+        Box<ExprNode>,
         Token, // ParenR
     ),
-    Call(FnCall),
+    Call(FnCallNode),
 }
 
-pub struct FnCall {
+#[derive(Debug)]
+pub struct FnCallNode {
     pub i: Token,  // Identifier
     pub pl: Token, // ParenL
-    pub a: FnArgs,
+    pub a: FnArgsNode,
     pub pr: Token, // ParenR
 }
 
-pub enum FnArgs {
-    Single(Box<Expr>),
-    Multiple(
-        Box<Expr>,
-        Token, // Comma
-        Box<FnArgs>,
-    ),
-    None,
-}
+pub type FnArgsNode = Vec<ExprNode>;
