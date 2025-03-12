@@ -1,53 +1,52 @@
- ## Nuktah BNF
+## Nuktah BNF Reference
 
-translation-unit -> decl-list
-decl-list        -> decl | decl • decl-list
-decl             -> var-decl | fn-decl
+**translation-unit** -> decl-list<br>
+**decl-list**        -> decl | decl • decl-list<br>
+**decl**             -> var-decl | fn-decl
 
-var-decl         -> type • T\_IDENTIFIER • T\_ASSIGN • expr-stmt
-fn-decl          -> T\_FUNC • type • T\_IDENTIFIER • T\_PARENL • params • T\_PARENR • block
-type             -> T\_INT | T\_STRING | T\_FLOAT
+**var-decl**         -> type • T_IDENTIFIER • T_ASSIGN • expr-stmt<br>
+**fn-decl**          -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block<br>
+**type**             -> T_INT | T_STRING | T_FLOAT
 
-params           -> param | param • T\_COMMA • params | EPSILON
-param            -> type • T\_IDENTIFIER
+**params**           -> param | param • T_COMMA • params | EPSILON<br>
+**param**            -> type • T_IDENTIFIER
 
-block            -> T\_BRACEL • stmts • T\_BRACER
-stmts            -> stmt • stmts | EPSILON
-stmt             -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
+**block**            -> T_BRACEL • stmts • T_BRACER<br>
+**stmts**            -> stmt • stmts | EPSILON<br>
+**stmt**             -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
 
-for-stmt         -> T\_FOR • T\_PARENL • expr-stmt • expr-stmt • expr • T\_PARENR • block
-if-stmt          -> T\_IF • T\_PARENL • expr • T\_PARENR • block • T\_ELSE • block
-ret-stmt         -> T\_RET • expr • T\_SEMICOLON
+**for-stmt**         -> T_FOR • T_PARENL • expr-stmt • expr-stmt • expr • T_PARENR • block<br>
+**if-stmt**          -> T_IF • T_PARENL • expr • T_PARENR • block • T_ELSE • block<br>
+**ret-stmt**         -> T_RET • expr • T_SEMICOLON
 
-expr-stmt        -> expr • T\_SEMICOLON
-expr             -> assign-expr
-assign-expr      -> bitwise-or-expr | assign-expr • T\_ASSIGN • bitwise-or-expr
+**expr-stmt**        -> expr • T_SEMICOLON<br>
+**expr**             -> assign-expr<br>
+**assign-expr**      -> bitwise-or-expr | assign-expr • T_ASSIGN • bitwise-or-expr
 
-bitwise-or-expr  -> bitwise-and-expr | bitwise-or-expr • T\_BITWISEOR • bitwise-and-expr
-bitwise-and-expr -> bool-expr | bitwise-and-expr • T\_BITWISEAND • bool-expr
+**bitwise-or-expr**  -> bitwise-and-expr | bitwise-or-expr • T_BITWISEOR • bitwise-and-expr<br>
+**bitwise-and-expr** -> bool-expr | bitwise-and-expr • T_BITWISEAND • bool-expr
 
-bool-expr        -> comp-expr | bool-expr • bool-op • comp-expr
-bool-op          -> T\_BOOLEANAND | T\_BOOLEANOR
+**bool-expr**        -> comp-expr | bool-expr • bool-op • comp-expr<br>
+**bool-op**          -> T_BOOLEANAND | T_BOOLEANOR
 
-comp-expr        -> shift-expr | comp-expr • comp-op • shift-expr
-comp-op          -> T\_LESSTHAN | T\_GREATERTHAN | T\_EQUALSOP
+**comp-expr**        -> shift-expr | comp-expr • comp-op • shift-expr<br>
+**comp-op**          -> T_LESSTHAN | T_GREATERTHAN | T_EQUALSOP
 
-shift-expr       -> add-expr | shift-expr • shift-op • add-expr
-shift-op         -> T\_SHIFTLEFT | T\_SHIFTRIGHT
+**shift-expr**       -> add-expr | shift-expr • shift-op • add-expr<br>
+**shift-op**         -> T_SHIFTLEFT | T_SHIFTRIGHT
 
-add-expr         -> mul-expr | add-expr • add-op • mul-expr
-add-op           -> T\_ADDOP | T\_SUBOP
+**add-expr**         -> mul-expr | add-expr • add-op • mul-expr<br>
+**add-op**           -> T_ADDOP | T_SUBOP
 
-mul-expr         -> exp-expr | mul-expr • mul-op • exp-expr
-mul-op           -> T\_MULOP | T\_DIVOP | T\_MODOP
+**mul-expr**         -> exp-expr | mul-expr • mul-op • exp-expr<br>
+**mul-op**           -> T_MULOP | T_DIVOP | T_MODOP
 
-exp-expr         -> unary-expr | exp-expr • T\_EXPOP • unary-expr
+**exp-expr**         -> unary-expr | exp-expr • T_EXPOP • unary-expr
 
-unary-expr       -> primary | unary-op • unary-expr
-unary-op         -> T\_SUBOP | T\_BOOLEANOT | T\_BITWISENOT
+**unary-expr**       -> primary | unary-op • unary-expr<br>
+**unary-op**         -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
 
-primary          -> T\_INTLIT | T\_FLOATLIT | T\_STRINGLIT | T\_IDENTIFIER | T\_PARENL • expr • T\_PARENR | fn-call
+**primary**          -> T_INTLIT | T_FLOATLIT | T_STRINGLIT | T_IDENTIFIER | T_PARENL • expr • T_PARENR | fn-call
 
-fn-call          -> T\_IDENTIFIER • T\_PARENL • args • T\_PARENR
-fn-args          -> expr | expr • T\_COMMA • fn-args | EPSILON
-
+**fn-call**          -> T_IDENTIFIER • T_PARENL • args • T_PARENR<br>
+**fn-args**          -> expr | expr • T_COMMA • fn-args | EPSILON
