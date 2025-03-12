@@ -361,6 +361,19 @@ impl<'a> Parser<'a> {
 
     // fn-args -> expr | expr • T_COMMA • fn-args | EPSILON
     fn parse_fn_args(&mut self) -> Result<ast::FnArgsNode, ParseError> {
-        todo!();
+        let mut params: Vec<ast::ExprNode> = Vec::new();
+
+        if let Some(Token::ParenR) = self.peek() {
+            return Ok(params);
+        }
+
+        params.push(self.parse_expr()?);
+
+        while let Some(Token::Comma) = self.peek() {
+            self.consume(Token::Comma)?;
+            params.push(self.parse_expr()?);
+        }
+
+        Ok(params)
     }
 }
