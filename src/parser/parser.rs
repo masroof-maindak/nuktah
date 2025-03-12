@@ -1,10 +1,13 @@
 use crate::lexer::token::Token;
+use crate::parser::ast;
+
+enum ParseError {}
 
 //────────────┐
 // Nuktah BNF |
 //────────────┘
 //
-// comp-unit        -> decl-list
+// translation-unit -> decl-list
 // decl-list        -> decl | decl • decl-list
 // decl             -> var-decl | fn-decl
 //
@@ -25,26 +28,27 @@ use crate::lexer::token::Token;
 //
 // expr-stmt        -> expr • T_SEMICOLON
 // expr             -> assign-expr
-// assign-expr      -> bitwise-or-expr | bitwise-or-expr • T_ASSIGN • assign-expr
+// assign-expr      -> bitwise-or-expr | assign-expr • T_ASSIGN • bitwise-or-expr
 //
-// bitwise-or-expr  -> bitwise-xor-expr | bitwise-or-expr • T_BITWISEOR • bitwise-xor-expr
-// bitwise-xor-expr -> bitwise-and-expr | bitwise-xor-expr • T_EXP_OP • bitwise-and-expr
+// bitwise-or-expr  -> bitwise-and-expr | bitwise-or-expr • T_BITWISEOR • bitwise-and-expr
 // bitwise-and-expr -> bool-expr | bitwise-and-expr • T_BITWISEAND • bool-expr
 //
-// bool-expr        -> comp-expr | comp-expr • bool-op • bool-expr
+// bool-expr        -> comp-expr | bool-expr • bool-op • comp-expr
 // bool-op          -> T_BOOLEANAND | T_BOOLEANOR
 //
-// comp-expr        -> shift-expr | shift-expr • comp-op • comp-expr
+// comp-expr        -> shift-expr | comp-expr • comp-op • shift-expr
 // comp-op          -> T_LESSTHAN | T_GREATERTHAN | T_EQUALSOP
 //
-// shift-expr       -> add-expr | add-expr • shift-op • shift-expr
+// shift-expr       -> add-expr | shift-expr • shift-op • add-expr
 // shift-op         -> T_SHIFTLEFT | T_SHIFTRIGHT
 //
-// add-expr         -> mul-expr | mul-expr • add-op • add-expr
+// add-expr         -> mul-expr | add-expr • add-op • mul-expr
 // add-op           -> T_ADDOP | T_SUBOP
 //
-// mul-expr         -> unary-expr | unary-expr • mul-op • mul-expr
+// mul-expr         -> exp-expr | mul-expr • mul-op • exp-expr
 // mul-op           -> T_MULOP | T_DIVOP | T_MODOP
+//
+// exp-expr         -> unary-expr | exp-expr • T_EXPOP • unary-expr
 //
 // unary-expr       -> primary | unary-op • unary-expr
 // unary-op         -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
@@ -57,4 +61,8 @@ use crate::lexer::token::Token;
 
 pub fn parse_token_list(_tokens: Vec<Token>) {
     todo!()
+}
+
+fn parse_var_decl(_n: ast::VarDecl) -> Result<ast::VarDeclNode, ParseError> {
+    todo!();
 }
