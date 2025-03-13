@@ -175,7 +175,7 @@ pub enum AddExprNode {
 
 #[derive(Debug)]
 pub enum MulExprNode {
-    Unary(ExpExprNode),
+    Exp(ExpExprNode),
     Mul(
         Box<MulExprNode>,
         Token, // {Mul,Div,Mod}Op
