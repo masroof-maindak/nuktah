@@ -27,13 +27,14 @@
 
 **expr-stmt**        -> expr • T_DOT<br>
 **expr**             -> assign-expr<br>
-**assign-expr**      -> bitwise-or-expr | assign-expr • T_ASSIGN • bitwise-or-expr
+**assign-expr**      -> bool-expr | assign-expr • T_ASSIGN • bool-expr
 
-**bitwise-or-expr**  -> bitwise-and-expr | bitwise-or-expr • T_BITWISEOR • bitwise-and-expr<br>
-**bitwise-and-expr** -> bool-expr | bitwise-and-expr • T_BITWISEAND • bool-expr
+**bool-expr**        -> bitwise-or-expr | bool-expr • bool-op • bitwise-or-expr<br>
+**bool-op**          -> T_BOOLEANOR | T_BOOLEANAND
 
-**bool-expr**        -> comp-expr | bool-expr • bool-op • comp-expr<br>
-**bool-op**          -> T_BOOLEANAND | T_BOOLEANOR
+**bitwise-or-expr**  -> bitwise-and-expr | bitwise-or-expr • T_BITWISEOR • bitwise-and-expr
+
+**bitwise-and-expr** -> comp-expr | bitwise-and-expr • T_BITWISEAND • comp-expr
 
 **comp-expr**        -> shift-expr | comp-expr • comp-op • shift-expr<br>
 **comp-op**          -> T_LESSTHAN | T_GREATERTHAN | T_EQUALSOP
@@ -54,5 +55,5 @@
 
 **primary**          -> T_INTLIT | T_FLOATLIT | T_STRINGLIT | T_IDENTIFIER | T_PARENL • expr • T_PARENR | fn-call
 
-**fn-call**          -> T_IDENTIFIER • T_PARENL • args • T_PARENR<br>
+**fn-call**          -> T_IDENTIFIER • T_PARENL • fn-args • T_PARENR<br>
 **fn-args**          -> expr | expr • T_COMMA • fn-args | EPSILON

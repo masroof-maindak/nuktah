@@ -105,10 +105,20 @@ pub type ExprNode = AssignExprNode;
 
 #[derive(Debug)]
 pub enum AssignExprNode {
-    BitwiseOr(BitwiseOrExprNode),
+    Bool(BoolExprNode),
     Assign(
         Box<AssignExprNode>,
         Token, // AssignOp
+        BoolExprNode,
+    ),
+}
+
+#[derive(Debug)]
+pub enum BoolExprNode {
+    BitwiseOr(BitwiseOrExprNode),
+    Bool(
+        Box<BoolExprNode>,
+        Token, // Boolean{And,Or}
         BitwiseOrExprNode,
     ),
 }
@@ -125,20 +135,10 @@ pub enum BitwiseOrExprNode {
 
 #[derive(Debug)]
 pub enum BitwiseAndExprNode {
-    Bool(BoolExprNode),
+    Comp(CompExprNode),
     BitwiseAnd(
         Box<BitwiseAndExprNode>,
         Token, // BitwiseAnd
-        BoolExprNode,
-    ),
-}
-
-#[derive(Debug)]
-pub enum BoolExprNode {
-    Comp(CompExprNode),
-    Bool(
-        Box<BoolExprNode>,
-        Token, // Boolean{And,Or}
         CompExprNode,
     ),
 }

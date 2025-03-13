@@ -281,8 +281,14 @@ impl<'a> Parser<'a> {
         Ok(self.parse_assign_expr()?)
     }
 
-    // assign-expr -> bitwise-or-expr | assign-expr • T_ASSIGN • bitwise-or-expr
+    // assign-expr -> bool-expr | assign-expr • T_ASSIGN • bool-expr
     fn parse_assign_expr(&mut self) -> Result<ast::AssignExprNode, ParseError> {
+        todo!();
+    }
+
+    // bool-expr -> bitwise-or-expr | bool-expr • bool_op • bitwise-or-expr
+    // bool-op -> T_BOOLEANOR | T_BOOLEANAND
+    fn parse_bool_expr(&mut self) -> Result<ast::BoolExprNode, ParseError> {
         todo!();
     }
 
@@ -291,14 +297,8 @@ impl<'a> Parser<'a> {
         todo!();
     }
 
-    // bitwise-and-expr -> bool-expr | bitwise-and-expr • T\_BITWISEAND • bool-expr
+    // bitwise-and-expr -> comp-expr | bitwise-and-expr • T_BITWISEAND • comp-expr
     fn parse_bitwise_and_expr(&mut self) -> Result<ast::BitwiseAndExprNode, ParseError> {
-        todo!();
-    }
-
-    // bool-expr -> comp-expr | bool-expr • bool_op • comp-expr
-    // bool-op -> T_BOOLEANOR | T_BOOLEANAND
-    fn parse_bool_expr(&mut self) -> Result<ast::BoolExprNode, ParseError> {
         todo!();
     }
 
@@ -309,30 +309,30 @@ impl<'a> Parser<'a> {
     }
 
     // shift-expr -> add-expr | shift-expr • shift-op • add-expr
-    // shift-op -> T\_SHIFTLEFT | T\_SHIFTRIGHT
+    // shift-op -> T_SHIFTLEFT | T_SHIFTRIGHT
     fn parse_shift_expr(&mut self) -> Result<ast::ShiftExprNode, ParseError> {
         todo!();
     }
 
     // add-expr -> mul-expr | add-expr • add-op • mul-expr
-    // add-op -> T\_ADDOP | T\_SUBOP
+    // add-op -> T_ADDOP | T_SUBOP
     fn parse_add_expr(&mut self) -> Result<ast::AddExprNode, ParseError> {
         todo!();
     }
 
     // mul-expr -> exp-expr | mul-expr • mul-op • exp-expr
-    // mul-op -> T\_MULOP | T\_DIVOP | T\_MODOP
+    // mul-op -> T_MULOP | T_DIVOP | T_MODOP
     fn parse_mul_expr(&mut self) -> Result<ast::MulExprNode, ParseError> {
         todo!();
     }
 
-    // exp-expr -> unary-expr | exp-expr • T\_EXPOP • unary-expr
+    // exp-expr -> unary-expr | exp-expr • T_EXPOP • unary-expr
     fn parse_exp_expr(&mut self) -> Result<ast::ExpExprNode, ParseError> {
         todo!();
     }
 
     // unary-expr -> primary | unary-op • unary-expr
-    // unary-op -> T\_SUBOP | T\_BOOLEANOT | T\_BITWISENOT
+    // unary-op -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
     fn parse_unary_expr(&mut self) -> Result<ast::UnaryExprNode, ParseError> {
         todo!();
     }
@@ -359,15 +359,15 @@ impl<'a> Parser<'a> {
 
     // fn-args -> expr | expr • T_COMMA • fn-args | EPSILON
     fn parse_fn_args(&mut self) -> Result<ast::FnArgsNode, ParseError> {
-        let mut params: Vec<ast::ExprNode> = Vec::new();
+        let mut params: Vec<ast::ExprNode> = Vec::new(); // Epsilon
 
-        if let Some(Token::ParenR) = self.peek() {
+        if let Some(Token::ParenR) = self.peek() { // Epsilon
             return Ok(params);
         }
 
-        params.push(self.parse_expr()?);
+        params.push(self.parse_expr()?); // expr
 
-        while let Some(Token::Comma) = self.peek() {
+        while let Some(Token::Comma) = self.peek() { // expr • T_COMMA • fn-args
             self.consume(Token::Comma)?;
             params.push(self.parse_expr()?);
         }
