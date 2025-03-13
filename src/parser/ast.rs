@@ -92,14 +92,13 @@ pub struct IfStmtNode {
 #[derive(Debug)]
 pub struct RetStmtNode {
     pub r: Token, // Ret
-    pub e: ExprNode,
-    pub s: Token, // Semicolon
+    pub e: ExprStmtNode,
 }
 
 #[derive(Debug)]
 pub struct ExprStmtNode {
     pub e: ExprNode,
-    pub s: Token, // Semicolon,
+    pub s: Token, // Dot,
 }
 
 pub type ExprNode = AssignExprNode;

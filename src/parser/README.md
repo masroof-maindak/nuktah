@@ -4,7 +4,9 @@
 **decl-list**        -> decl | decl • decl-list<br>
 **decl**             -> var-decl | fn-decl
 
+// no empty initialization<br>
 **var-decl**         -> type • T_IDENTIFIER • T_ASSIGN • expr-stmt<br>
+
 **fn-decl**          -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block<br>
 **type**             -> T_INT | T_STRING | T_FLOAT
 
@@ -15,11 +17,15 @@
 **stmts**            -> stmt • stmts | EPSILON<br>
 **stmt**             -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
 
-**for-stmt**         -> T_FOR • T_PARENL • expr-stmt • expr-stmt • expr • T_PARENR • block<br>
-**if-stmt**          -> T_IF • T_PARENL • expr • T_PARENR • block • T_ELSE • block<br>
-**ret-stmt**         -> T_RET • expr • T_SEMICOLON
+// no empty init/cond/inc<br>
+**for-stmt**         -> T_FOR • T_PARENL • expr-stmt • expr-stmt • expr • T_PARENR • block
 
-**expr-stmt**        -> expr • T_SEMICOLON<br>
+// mandatory else<br>
+**if-stmt**          -> T_IF • T_PARENL • expr • T_PARENR • block • T_ELSE • block<br>
+
+**ret-stmt**         -> T_RET • expr-stmt
+
+**expr-stmt**        -> expr • T_DOT<br>
 **expr**             -> assign-expr<br>
 **assign-expr**      -> bitwise-or-expr | assign-expr • T_ASSIGN • bitwise-or-expr
 

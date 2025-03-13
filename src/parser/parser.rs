@@ -254,27 +254,25 @@ impl<'a> Parser<'a> {
         })
     }
 
-    // ret-stmt -> T_RET • expr • T_SEMICOLON
+    // ret-stmt -> T_RET • expr • T_DOT
     fn parse_ret_stmt(&mut self) -> Result<ast::RetStmtNode, ParseError> {
         self.consume(Token::Return)?;
-        let expr = self.parse_expr()?;
-        self.consume(Token::Semicolon)?;
+        let expr_stmt = self.parse_expr_stmt()?;
 
         Ok(ast::RetStmtNode {
             r: Token::Return,
-            e: expr,
-            s: Token::Semicolon,
+            e: expr_stmt,
         })
     }
 
-    // expr-stmt -> expr • T_SEMICOLON
+    // expr-stmt -> expr • T_Dot
     fn parse_expr_stmt(&mut self) -> Result<ast::ExprStmtNode, ParseError> {
         let expr = self.parse_expr()?;
-        self.consume(Token::Semicolon)?;
+        self.consume(Token::Dot)?;
 
         Ok(ast::ExprStmtNode {
             e: expr,
-            s: Token::Semicolon,
+            s: Token::Dot,
         })
     }
 
