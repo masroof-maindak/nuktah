@@ -5,10 +5,10 @@ const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 #[derive(Debug)]
 pub enum LexerError {
     UnterminatedStringLit,
-    InvalidCharacter(String),
+    InvalidIdentifier(String),
 }
 
-pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
+pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
     let mut token_list: Vec<Token> = Vec::new();
     let mut idx = 0;
     let mut quotes_started = false;
@@ -31,6 +31,8 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
             continue;
         }
 
+        // TODO: combine `intlit • dot • intlit` into `floatlit`
+
         consolidate_tokens(&mut token_list, &mut t, quotes_started);
 
         if t == Token::Quotes {
@@ -40,10 +42,11 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
         token_list.push(t);
     }
 
+    token_list.retain(|t| ![Token::Whitespace, Token::Newline].contains(&t));
     Ok(token_list)
 }
 
-fn strtok<'a>(src: &'a String, delims: &[u8], idx: &mut usize) -> &'a str {
+fn strtok<'a>(src: &'a str, delims: &[u8], idx: &mut usize) -> &'a str {
     let remaining_text = &src[*idx..];
     let (delim_offset, _) = remaining_text
         .bytes()
@@ -120,12 +123,20 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
         ">" => return Ok(Token::GreaterThan),
 
         _ => {
+            // Int
             if let Ok(n) = word.parse::<i64>() {
                 return Ok(Token::IntLit(n));
             }
 
-            if !word.chars().all(|c| c.is_alphabetic()) {
-                return Err(LexerError::InvalidCharacter(word.to_string()));
+            // Identifier
+            // Start with a letter or underscore
+            if !word.starts_with(|c: char| c.is_alphabetic() || c == '_') {
+                return Err(LexerError::InvalidIdentifier(word.to_string()));
+            }
+
+            // word should only contain letters, numbers, and underscores
+            if !word.chars().all(|c| c.is_alphanumeric() || c == '_') {
+                return Err(LexerError::InvalidIdentifier(word.to_string()));
             }
 
             return Ok(Token::Identifier(word.to_string()));
