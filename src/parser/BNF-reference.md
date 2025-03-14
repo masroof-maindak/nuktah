@@ -50,7 +50,6 @@
 
 **exp-expr**         -> unary-expr | unary-expr • T\_EXPOP • exp-expr
 
-// CHECK
 **unary-expr**       -> primary | unary-op • unary-expr<br>
 **unary-op**         -> T\_SUBOP | T\_BOOLEANOT | T\_BITWISENOT
 
