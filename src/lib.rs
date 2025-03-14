@@ -171,7 +171,7 @@ fn print_stmt(stmt: &Stmt, indent: &str) {
         Stmt::For(for_stmt) => {
             println!("{}For Loop:", indent);
             println!("{}  Initialization:", indent);
-            print_expr(&for_stmt.init.e, &format!("{}    ", indent));
+            print_expr(&for_stmt.init.e.e, &format!("{}    ", indent));
             println!("{}  Condition:", indent);
             print_expr(&for_stmt.cond.e, &format!("{}    ", indent));
             println!("{}  Increment:", indent);

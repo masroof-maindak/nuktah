@@ -18,7 +18,7 @@
 **stmt**             -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
 
 // no empty init/cond/inc<br>
-**for-stmt**         -> T\_FOR • T\_PARENL • expr-stmt • expr-stmt • expr • T\_PARENR • block
+**for-stmt**         -> T\_FOR • T\_PARENL • var-decl • expr-stmt • expr • T\_PARENR • block
 
 // mandatory else<br>
 **if-stmt**          -> T\_IF • T\_PARENL • expr • T\_PARENR • block • T\_ELSE • block<br>

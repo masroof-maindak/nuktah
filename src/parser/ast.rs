@@ -66,7 +66,7 @@ pub enum Stmt {
 pub struct ForStmt {
     pub f: Token,  // For
     pub pl: Token, // ParenL
-    pub init: ExprStmt,
+    pub init: VarDecl,
     pub cond: ExprStmt,
     pub inc: Expr,
     pub pr: Token, // ParenR

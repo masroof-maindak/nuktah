@@ -253,11 +253,11 @@ impl<'a> Parser<'a> {
         Ok(stmts)
     }
 
-    // for-stmt -> T_FOR • T_PARENL • expr-stmt • expr-stmt • expr • T_PARENR • block
+    // for-stmt -> T_FOR • T_PARENL • var-decl • expr-stmt • expr • T_PARENR • block
     fn parse_for_stmt(&mut self) -> Result<ast::ForStmt, ParseError> {
         self.consume(Token::For)?;
         self.consume(Token::ParenL)?;
-        let init = self.parse_expr_stmt()?;
+        let init = self.parse_var_decl()?;
         let cond = self.parse_expr_stmt()?;
         let incr = self.parse_expr()?;
         self.consume(Token::ParenR)?;
