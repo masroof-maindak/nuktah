@@ -1,6 +1,6 @@
 use crate::lexer::token::Token;
 
-const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
+const DELIM: &str = " \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 
 #[derive(Debug)]
 pub enum LexerError {
@@ -46,26 +46,28 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
     Ok(token_list)
 }
 
-fn strtok<'a>(src: &'a str, delims: &[u8], idx: &mut usize) -> &'a str {
+fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
     let remaining_text = &src[*idx..];
-    let (delim_offset, _) = remaining_text
-        .bytes()
-        .enumerate()
-        .find(|(_, c)| delims.contains(c))
-        .unwrap_or_else(|| (std::usize::MAX, b'~'));
 
-    if delim_offset == 0 {
-        *idx += 1;
-        return &remaining_text[0..1];
+    let first_char = remaining_text.chars().next().unwrap();
+    if delims.contains(first_char) {
+        *idx += first_char.len_utf8();
+        return &remaining_text[0..first_char.len_utf8()];
     }
 
-    if delim_offset == std::usize::MAX {
-        *idx = delim_offset;
+    let byte_count = remaining_text
+        .chars()
+        .take_while(|c| !delims.contains(*c))
+        .map(|c| c.len_utf8())
+        .sum();
+
+    if byte_count == remaining_text.len() {
+        *idx += byte_count;
         return remaining_text;
     }
 
-    *idx += delim_offset;
-    return &remaining_text[..delim_offset];
+    *idx += byte_count;
+    return &remaining_text[..byte_count];
 }
 
 fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError> {
