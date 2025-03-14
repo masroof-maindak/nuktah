@@ -49,7 +49,7 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
 fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
     let remaining_text = &src[*idx..];
 
-    let first_char = remaining_text.chars().next().unwrap();
+    let first_char = remaining_text.chars().next().unwrap(); // guaranteed to be non-empty
     if delims.contains(first_char) {
         *idx += first_char.len_utf8();
         return &remaining_text[0..first_char.len_utf8()];
@@ -60,11 +60,6 @@ fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
         .take_while(|c| !delims.contains(*c))
         .map(|c| c.len_utf8())
         .sum();
-
-    if byte_count == remaining_text.len() {
-        *idx += byte_count;
-        return remaining_text;
-    }
 
     *idx += byte_count;
     return &remaining_text[..byte_count];
@@ -80,49 +75,49 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
     }
 
     match word {
-        "for" => return Ok(Token::For),
-        "if" => return Ok(Token::If),
-        "else" => return Ok(Token::Else),
-        "ret" => return Ok(Token::Return),
+        "for" => Ok(Token::For),
+        "if" => Ok(Token::If),
+        "else" => Ok(Token::Else),
+        "ret" => Ok(Token::Return),
 
-        "int" => return Ok(Token::Int),
-        "float" => return Ok(Token::Float),
-        "string" => return Ok(Token::String),
-        "fn" => return Ok(Token::Function),
+        "int" => Ok(Token::Int),
+        "float" => Ok(Token::Float),
+        "string" => Ok(Token::String),
+        "fn" => Ok(Token::Function),
 
-        "(" => return Ok(Token::ParenL),
-        ")" => return Ok(Token::ParenR),
-        "{" => return Ok(Token::BraceL),
-        "}" => return Ok(Token::BraceR),
-        "[" => return Ok(Token::BracketL),
-        "]" => return Ok(Token::BracketR),
-        "`" => return Ok(Token::Backtick),
-        "\'" => return Ok(Token::Quote),
+        "(" => Ok(Token::ParenL),
+        ")" => Ok(Token::ParenR),
+        "{" => Ok(Token::BraceL),
+        "}" => Ok(Token::BraceR),
+        "[" => Ok(Token::BracketL),
+        "]" => Ok(Token::BracketR),
+        "`" => Ok(Token::Backtick),
+        "\'" => Ok(Token::Quote),
 
-        " " => return Ok(Token::Whitespace),
-        "\n" => return Ok(Token::Newline),
-        "\t" => return Ok(Token::Whitespace),
-        "\r" => return Ok(Token::Whitespace),
-        ":" => return Ok(Token::Colon),
-        ";" => return Ok(Token::Semicolon),
-        "$" => return Ok(Token::Comment),
+        " " => Ok(Token::Whitespace),
+        "\n" => Ok(Token::Newline),
+        "\t" => Ok(Token::Whitespace),
+        "\r" => Ok(Token::Whitespace),
+        ":" => Ok(Token::Colon),
+        ";" => Ok(Token::Semicolon),
+        "$" => Ok(Token::Comment),
 
-        "=" => return Ok(Token::AssignOp),
-        "+" => return Ok(Token::AddOp),
-        "-" => return Ok(Token::SubOp),
-        "*" => return Ok(Token::MulOp),
-        "/" => return Ok(Token::DivOp),
-        "%" => return Ok(Token::ModOp),
-        "^" => return Ok(Token::ExpOp),
+        "=" => Ok(Token::AssignOp),
+        "+" => Ok(Token::AddOp),
+        "-" => Ok(Token::SubOp),
+        "*" => Ok(Token::MulOp),
+        "/" => Ok(Token::DivOp),
+        "%" => Ok(Token::ModOp),
+        "^" => Ok(Token::ExpOp),
 
-        "." => return Ok(Token::Dot),
-        "," => return Ok(Token::Comma),
-        "!" => return Ok(Token::BooleanNot),
-        "&" => return Ok(Token::BitwiseAnd),
-        "|" => return Ok(Token::BitwiseOr),
-        "~" => return Ok(Token::BitwiseNot),
-        "<" => return Ok(Token::LessThan),
-        ">" => return Ok(Token::GreaterThan),
+        "." => Ok(Token::Dot),
+        "," => Ok(Token::Comma),
+        "!" => Ok(Token::BooleanNot),
+        "&" => Ok(Token::BitwiseAnd),
+        "|" => Ok(Token::BitwiseOr),
+        "~" => Ok(Token::BitwiseNot),
+        "<" => Ok(Token::LessThan),
+        ">" => Ok(Token::GreaterThan),
 
         _ => {
             // Int
@@ -141,7 +136,7 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
                 return Err(LexerError::InvalidIdentifier(word.to_string()));
             }
 
-            return Ok(Token::Identifier(word.to_string()));
+            Ok(Token::Identifier(word.to_string()))
         }
     }
 }
