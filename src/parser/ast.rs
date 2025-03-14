@@ -32,6 +32,7 @@ pub struct FnDecl {
     pub p: Params,
     pub pr: Token, // ParenR,
     pub b: Block,
+    pub d: Token, // Dot
 }
 
 pub type Type = Token; // {Int,String,Float}Lit
@@ -109,29 +110,29 @@ pub enum AssignExpr {
 
 #[derive(Debug)]
 pub enum BoolExpr {
-    BitwiseOr(BitwiseOrExpr),
+    BitOr(BitOrExpr),
     Bool(
         Box<BoolExpr>,
         Token, // Boolean{And,Or}
-        BitwiseOrExpr,
+        BitOrExpr,
     ),
 }
 
 #[derive(Debug)]
-pub enum BitwiseOrExpr {
-    BitwiseAnd(BitwiseAndExpr),
-    BitwiseOr(
-        Box<BitwiseOrExpr>,
+pub enum BitOrExpr {
+    BitAnd(BitAndExpr),
+    BitOr(
+        Box<BitOrExpr>,
         Token, // BitwiseOr
-        BitwiseAndExpr,
+        BitAndExpr,
     ),
 }
 
 #[derive(Debug)]
-pub enum BitwiseAndExpr {
+pub enum BitAndExpr {
     Comp(CompExpr),
-    BitwiseAnd(
-        Box<BitwiseAndExpr>,
+    BitAnd(
+        Box<BitAndExpr>,
         Token, // BitwiseAnd
         CompExpr,
     ),

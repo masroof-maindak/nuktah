@@ -14,6 +14,8 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
         let word = strtok(src, DELIM, &mut idx);
         let mut t = identify_token(word, quotes_started)?;
 
+        // TODO: combine `intlit • dot • intlit` into `floatlit`
+
         // TODO: implement comment consolidation and removal at this part
         if t == Token::Whitespace || t == Token::Newline {
             continue;

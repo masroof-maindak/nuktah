@@ -7,7 +7,7 @@
 // no empty initialization<br>
 **var-decl**         -> type • T\_IDENTIFIER • T\_ASSIGN • expr-stmt<br>
 
-**fn-decl**          -> T\_FUNC • type • T\_IDENTIFIER • T\_PARENL • params • T\_PARENR • block<br>
+**fn-decl**          -> T\_FUNC • type • T\_IDENTIFIER • T\_PARENL • params • T\_PARENR • block • T\_DOT<br>
 **type**             -> T\_INT | T\_STRING | T\_FLOAT
 
 **params**           -> param | param • T\_COMMA • params | EPSILON<br>

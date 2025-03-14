@@ -56,6 +56,10 @@ impl<'a> Parser<'a> {
 
     // Consumes the token if it matches the expected token, otherwise returns an error.
     fn consume(&mut self, expected: Token) -> Result<(), ParseError> {
+        if self.pos >= self.token_stream.len() {
+            return Err(ParseError::UnexpectedEOF);
+        }
+
         if self.accept(&expected) {
             Ok(())
         } else {
@@ -118,9 +122,9 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // FIXME: currently getting a deeply-nested list with the `primary-expr` at the very end
-    // Can we get rid of this? One approach might be to convert every intermediate expression
-    // to an AstNode
+    // CHECK: currently getting a deeply-nested list with the `primary-expr` at the very end
+    // Can we get rid of this? Do we even need to? Should we need to, one approach might be
+    // to convert every intermediate expression to an AstNode
 
     // translation-unit -> decl-list
     fn parse_translation_unit(&mut self) -> Result<ast::TranslationUnit, ParseError> {
@@ -148,8 +152,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // FIXME: `fn int a() {} .` returns a `ParserError(ExpectedTypeToken)`
-    // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block
+    // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block • T_DOT
     fn parse_fn_decl(&mut self) -> Result<ast::FnDecl, ParseError> {
         self.consume(Token::Function)?;
         let type_token = self.consume_type_token()?;
@@ -158,6 +161,7 @@ impl<'a> Parser<'a> {
         let params = self.parse_params()?;
         self.consume(Token::ParenR)?;
         let block = self.parse_block()?;
+        self.consume(Token::Dot)?;
 
         Ok(ast::FnDecl {
             f: Token::Function,
@@ -167,6 +171,7 @@ impl<'a> Parser<'a> {
             p: params,
             pr: Token::ParenR,
             b: block,
+            d: Token::Dot,
         })
     }
 
@@ -340,7 +345,7 @@ impl<'a> Parser<'a> {
     // bool-expr -> bitwise-or-expr | bool-expr • bool_op • bitwise-or-expr
     // bool-op -> T_BOOLEANOR | T_BOOLEANAND
     fn parse_bool_expr(&mut self) -> Result<ast::BoolExpr, ParseError> {
-        let mut left = ast::BoolExpr::BitwiseOr(self.parse_bitwise_or_expr()?);
+        let mut left = ast::BoolExpr::BitOr(self.parse_bitwise_or_expr()?);
 
         while let Some(bool_op @ (Token::BooleanOr | Token::BooleanAnd)) = self.peek().cloned() {
             self.advance();
@@ -356,26 +361,26 @@ impl<'a> Parser<'a> {
     }
 
     // bitwise-or-expr -> bitwise-and-expr | bitwise-or-expr • T_BITWISE_OR • bitwise-and-expr
-    fn parse_bitwise_or_expr(&mut self) -> Result<ast::BitwiseOrExpr, ParseError> {
-        let mut left = ast::BitwiseOrExpr::BitwiseAnd(self.parse_bitwise_and_expr()?);
+    fn parse_bitwise_or_expr(&mut self) -> Result<ast::BitOrExpr, ParseError> {
+        let mut left = ast::BitOrExpr::BitAnd(self.parse_bitwise_and_expr()?);
 
         while let Some(Token::BitwiseOr) = self.peek().cloned() {
             self.advance();
             let right = self.parse_bitwise_and_expr()?;
-            left = ast::BitwiseOrExpr::BitwiseOr(Box::new(left), Token::BitwiseOr, right)
+            left = ast::BitOrExpr::BitOr(Box::new(left), Token::BitwiseOr, right)
         }
 
         Ok(left)
     }
 
     // bitwise-and-expr -> comp-expr | bitwise-and-expr • T_BITWISEAND • comp-expr
-    fn parse_bitwise_and_expr(&mut self) -> Result<ast::BitwiseAndExpr, ParseError> {
-        let mut left = ast::BitwiseAndExpr::Comp(self.parse_comp_expr()?);
+    fn parse_bitwise_and_expr(&mut self) -> Result<ast::BitAndExpr, ParseError> {
+        let mut left = ast::BitAndExpr::Comp(self.parse_comp_expr()?);
 
         while let Some(Token::BitwiseAnd) = self.peek().cloned() {
             self.advance();
             let right = self.parse_comp_expr()?;
-            left = ast::BitwiseAndExpr::BitwiseAnd(Box::new(left), Token::BitwiseAnd, right)
+            left = ast::BitAndExpr::BitAnd(Box::new(left), Token::BitwiseAnd, right)
         }
 
         Ok(left)
@@ -493,7 +498,7 @@ impl<'a> Parser<'a> {
 
         match self.peek().unwrap() {
             Token::Identifier(_) => {
-                if self.peek_next() == Some(&Token::ParenL) {
+                if let Some(Token::ParenL) = self.peek_next() {
                     return Ok(ast::PrimaryExpr::Call(self.parse_fn_call()?));
                 }
 
