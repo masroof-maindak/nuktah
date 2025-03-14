@@ -1,0 +1,5 @@
+fn int a(int x, int y) {} .
+
+int b = a(3, 6).
+
+int f = d - b + 3 * e.
