@@ -245,7 +245,7 @@ fn print_ast_node(node: &TranslationUnit, indent: usize) {
     }
 }
 
-pub fn compile_src(src_code: &mut String) -> Result<(), CompilerError> {
+pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     let tokens = lexer::lexer::tokenize_src_code(src_code)?;
     println!("Tokens:\n{:?}\n", tokens);
 
