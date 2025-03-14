@@ -13,7 +13,7 @@ pub enum ParseError {
     ExpectedStringLit,
 }
 
-pub fn parse_token_stream(tokens: &Vec<Token>) -> Result<ast::TranslationUnitNode, ParseError> {
+pub fn parse_token_stream(tokens: &Vec<Token>) -> Result<ast::TranslationUnit, ParseError> {
     let mut p = Parser::new(tokens);
     Ok(p.parse_translation_unit()?)
 }
@@ -107,7 +107,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn get_type_token(&self) -> Option<ast::TypeNode> {
+    fn get_type_token(&self) -> Option<ast::Type> {
         match self.peek() {
             Some(token) => match token {
                 Token::Int => Some(Token::Int),
@@ -122,12 +122,12 @@ impl<'a> Parser<'a> {
     // ----------------------------------- //
 
     // translation-unit -> decl-list
-    fn parse_translation_unit(&mut self) -> Result<ast::TranslationUnitNode, ParseError> {
+    fn parse_translation_unit(&mut self) -> Result<ast::TranslationUnit, ParseError> {
         self.parse_decl_list()
     }
 
     // decl-list -> decl | decl • decl-list
-    fn parse_decl_list(&mut self) -> Result<ast::DeclListNode, ParseError> {
+    fn parse_decl_list(&mut self) -> Result<ast::DeclList, ParseError> {
         let mut root = Vec::new();
 
         // CHECK: Not too sure about this one.
@@ -147,16 +147,16 @@ impl<'a> Parser<'a> {
     }
 
     // decl -> var-decl | fn-decl
-    fn parse_decl(&mut self) -> Result<ast::DeclNode, ParseError> {
+    fn parse_decl(&mut self) -> Result<ast::Decl, ParseError> {
         if self.peek() == Some(&Token::Function) {
-            Ok(ast::DeclNode::FnDeclNode(self.parse_fn_decl()?))
+            Ok(ast::Decl::Fn(self.parse_fn_decl()?))
         } else {
-            Ok(ast::DeclNode::VarDeclNode(self.parse_var_decl()?))
+            Ok(ast::Decl::Var(self.parse_var_decl()?))
         }
     }
 
     // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block
-    fn parse_fn_decl(&mut self) -> Result<ast::FnDeclNode, ParseError> {
+    fn parse_fn_decl(&mut self) -> Result<ast::FnDecl, ParseError> {
         self.consume(Token::Function)?;
         let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
         let ident = self.consume_identifier()?;
@@ -165,7 +165,7 @@ impl<'a> Parser<'a> {
         self.consume(Token::ParenR)?;
         let block = self.parse_block()?;
 
-        Ok(ast::FnDeclNode {
+        Ok(ast::FnDecl {
             f: Token::Function,
             t: type_token,
             i: Token::Identifier(ident),
@@ -177,13 +177,13 @@ impl<'a> Parser<'a> {
     }
 
     // var-decl -> type • T_IDENTIFIER • T_ASSIGN • expr-stmt
-    fn parse_var_decl(&mut self) -> Result<ast::VarDeclNode, ParseError> {
+    fn parse_var_decl(&mut self) -> Result<ast::VarDecl, ParseError> {
         let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
         let ident = self.consume_identifier()?;
         self.consume(Token::AssignOp)?;
         let expr_stmt = self.parse_expr_stmt()?;
 
-        Ok(ast::VarDeclNode {
+        Ok(ast::VarDecl {
             t: type_token,
             i: Token::Identifier(ident),
             a: Token::AssignOp,
@@ -192,8 +192,8 @@ impl<'a> Parser<'a> {
     }
 
     // params -> param | param • T_COMMA • params | EPSILON
-    fn parse_params(&mut self) -> Result<ast::ParamsNode, ParseError> {
-        let mut params: Vec<ast::ParamNode> = Vec::new();
+    fn parse_params(&mut self) -> Result<ast::Params, ParseError> {
+        let mut params: Vec<ast::Param> = Vec::new();
 
         if let Some(Token::ParenR) = self.peek() {
             return Ok(params);
@@ -210,23 +210,23 @@ impl<'a> Parser<'a> {
     }
 
     // param -> type • T_IDENTIFIER
-    fn parse_param(&mut self) -> Result<ast::ParamNode, ParseError> {
+    fn parse_param(&mut self) -> Result<ast::Param, ParseError> {
         let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
         let ident = self.consume_identifier()?;
 
-        Ok(ast::ParamNode {
+        Ok(ast::Param {
             t: type_token,
             i: Token::Identifier(ident),
         })
     }
 
     // block -> T_BRACE_L • stmts • T_BRACE_R
-    fn parse_block(&mut self) -> Result<ast::BlockNode, ParseError> {
+    fn parse_block(&mut self) -> Result<ast::Block, ParseError> {
         self.consume(Token::BraceL)?;
         let stmts = self.parse_stmts()?;
         self.consume(Token::BraceR)?;
 
-        Ok(ast::BlockNode {
+        Ok(ast::Block {
             l: Token::BraceL,
             s: stmts,
             r: Token::BraceR,
@@ -235,19 +235,19 @@ impl<'a> Parser<'a> {
 
     // stmts -> stmt • stmts | EPSILON
     // stmt -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
-    fn parse_stmts(&mut self) -> Result<ast::StmtsNode, ParseError> {
-        let mut stmts: Vec<ast::StmtNode> = Vec::new();
+    fn parse_stmts(&mut self) -> Result<ast::Stmts, ParseError> {
+        let mut stmts: Vec<ast::Stmt> = Vec::new();
 
         while let Some(t) = self.peek() {
             match t {
-                Token::For => stmts.push(ast::StmtNode::For(self.parse_for_stmt()?)),
-                Token::If => stmts.push(ast::StmtNode::If(self.parse_if_stmt()?)),
-                Token::Return => stmts.push(ast::StmtNode::Ret(self.parse_ret_stmt()?)),
+                Token::For => stmts.push(ast::Stmt::For(self.parse_for_stmt()?)),
+                Token::If => stmts.push(ast::Stmt::If(self.parse_if_stmt()?)),
+                Token::Return => stmts.push(ast::Stmt::Ret(self.parse_ret_stmt()?)),
                 Token::Int | Token::String | Token::Float => {
-                    stmts.push(ast::StmtNode::VarDecl(self.parse_var_decl()?))
+                    stmts.push(ast::Stmt::VarDecl(self.parse_var_decl()?))
                 }
                 Token::BraceR => break, // end of encapsulating block...
-                _ => stmts.push(ast::StmtNode::ExprStmtNode(self.parse_expr_stmt()?)),
+                _ => stmts.push(ast::Stmt::ExprStmt(self.parse_expr_stmt()?)),
             }
         }
 
@@ -255,7 +255,7 @@ impl<'a> Parser<'a> {
     }
 
     // for-stmt -> T_FOR • T_PARENL • expr-stmt • expr-stmt • expr • T_PARENR • block
-    fn parse_for_stmt(&mut self) -> Result<ast::ForStmtNode, ParseError> {
+    fn parse_for_stmt(&mut self) -> Result<ast::ForStmt, ParseError> {
         self.consume(Token::For)?;
         self.consume(Token::ParenL)?;
         let init = self.parse_expr_stmt()?;
@@ -264,7 +264,7 @@ impl<'a> Parser<'a> {
         self.consume(Token::ParenR)?;
         let block = self.parse_block()?;
 
-        Ok(ast::ForStmtNode {
+        Ok(ast::ForStmt {
             f: Token::For,
             pl: Token::ParenL,
             init,
@@ -276,7 +276,7 @@ impl<'a> Parser<'a> {
     }
 
     // if-stmt -> T_IF • T_PARENL • expr • T_PARENR • block • T_ELSE • block
-    fn parse_if_stmt(&mut self) -> Result<ast::IfStmtNode, ParseError> {
+    fn parse_if_stmt(&mut self) -> Result<ast::IfStmt, ParseError> {
         self.consume(Token::If)?;
         self.consume(Token::ParenL)?;
         let cond = self.parse_expr()?;
@@ -285,7 +285,7 @@ impl<'a> Parser<'a> {
         self.consume(Token::Else)?;
         let else_block = self.parse_block()?;
 
-        Ok(ast::IfStmtNode {
+        Ok(ast::IfStmt {
             i: Token::If,
             pl: Token::ParenL,
             e: cond,
@@ -297,47 +297,47 @@ impl<'a> Parser<'a> {
     }
 
     // ret-stmt -> T_RET • expr • T_DOT
-    fn parse_ret_stmt(&mut self) -> Result<ast::RetStmtNode, ParseError> {
+    fn parse_ret_stmt(&mut self) -> Result<ast::RetStmt, ParseError> {
         self.consume(Token::Return)?;
         let expr_stmt = self.parse_expr_stmt()?;
 
-        Ok(ast::RetStmtNode {
+        Ok(ast::RetStmt {
             r: Token::Return,
             e: expr_stmt,
         })
     }
 
     // expr-stmt -> expr • T_Dot
-    fn parse_expr_stmt(&mut self) -> Result<ast::ExprStmtNode, ParseError> {
+    fn parse_expr_stmt(&mut self) -> Result<ast::ExprStmt, ParseError> {
         let expr = self.parse_expr()?;
         self.consume(Token::Dot)?;
 
-        Ok(ast::ExprStmtNode {
+        Ok(ast::ExprStmt {
             e: expr,
             s: Token::Dot,
         })
     }
 
     // expr -> assign-expr
-    fn parse_expr(&mut self) -> Result<ast::ExprNode, ParseError> {
+    fn parse_expr(&mut self) -> Result<ast::Expr, ParseError> {
         Ok(self.parse_assign_expr()?)
     }
 
     // assign-expr -> bool-expr | assign-expr • T_ASSIGN • bool-expr
-    fn parse_assign_expr(&mut self) -> Result<ast::AssignExprNode, ParseError> {
+    fn parse_assign_expr(&mut self) -> Result<ast::AssignExpr, ParseError> {
         // CHECK: this should be right-associative
         todo!();
     }
 
     // bool-expr -> bitwise-or-expr | bool-expr • bool_op • bitwise-or-expr
     // bool-op -> T_BOOLEANOR | T_BOOLEANAND
-    fn parse_bool_expr(&mut self) -> Result<ast::BoolExprNode, ParseError> {
-        let mut left = ast::BoolExprNode::BitwiseOr(self.parse_bitwise_or_expr()?);
+    fn parse_bool_expr(&mut self) -> Result<ast::BoolExpr, ParseError> {
+        let mut left = ast::BoolExpr::BitwiseOr(self.parse_bitwise_or_expr()?);
 
         while let Some(bool_op @ (Token::BooleanOr | Token::BooleanAnd)) = self.peek().cloned() {
             self.advance();
             let right = self.parse_bitwise_or_expr()?;
-            left = ast::BoolExprNode::Bool(
+            left = ast::BoolExpr::Bool(
                 Box::new(left),
                 bool_op, // && or ||
                 right,
@@ -348,26 +348,26 @@ impl<'a> Parser<'a> {
     }
 
     // bitwise-or-expr -> bitwise-and-expr | bitwise-or-expr • T_BITWISE_OR • bitwise-and-expr
-    fn parse_bitwise_or_expr(&mut self) -> Result<ast::BitwiseOrExprNode, ParseError> {
-        let mut left = ast::BitwiseOrExprNode::BitwiseAnd(self.parse_bitwise_and_expr()?);
+    fn parse_bitwise_or_expr(&mut self) -> Result<ast::BitwiseOrExpr, ParseError> {
+        let mut left = ast::BitwiseOrExpr::BitwiseAnd(self.parse_bitwise_and_expr()?);
 
         while let Some(Token::BitwiseOr) = self.peek().cloned() {
             self.advance();
             let right = self.parse_bitwise_and_expr()?;
-            left = ast::BitwiseOrExprNode::BitwiseOr(Box::new(left), Token::BitwiseOr, right)
+            left = ast::BitwiseOrExpr::BitwiseOr(Box::new(left), Token::BitwiseOr, right)
         }
 
         Ok(left)
     }
 
     // bitwise-and-expr -> comp-expr | bitwise-and-expr • T_BITWISEAND • comp-expr
-    fn parse_bitwise_and_expr(&mut self) -> Result<ast::BitwiseAndExprNode, ParseError> {
-        let mut left = ast::BitwiseAndExprNode::Comp(self.parse_comp_expr()?);
+    fn parse_bitwise_and_expr(&mut self) -> Result<ast::BitwiseAndExpr, ParseError> {
+        let mut left = ast::BitwiseAndExpr::Comp(self.parse_comp_expr()?);
 
         while let Some(Token::BitwiseAnd) = self.peek().cloned() {
             self.advance();
             let right = self.parse_comp_expr()?;
-            left = ast::BitwiseAndExprNode::BitwiseAnd(Box::new(left), Token::BitwiseAnd, right)
+            left = ast::BitwiseAndExpr::BitwiseAnd(Box::new(left), Token::BitwiseAnd, right)
         }
 
         Ok(left)
@@ -375,15 +375,15 @@ impl<'a> Parser<'a> {
 
     // comp-expr -> shift-expr | comp-expr • comp_op • shift-expr
     // comp-op -> T_LESSTHAN, T_GREATERTHAN, T_EQUALSOP
-    fn parse_comp_expr(&mut self) -> Result<ast::CompExprNode, ParseError> {
-        let mut left = ast::CompExprNode::Shift(self.parse_shift_expr()?);
+    fn parse_comp_expr(&mut self) -> Result<ast::CompExpr, ParseError> {
+        let mut left = ast::CompExpr::Shift(self.parse_shift_expr()?);
 
         while let Some(comp_op @ (Token::LessThan | Token::GreaterThan | Token::EqualsOp)) =
             self.peek().cloned()
         {
             self.advance();
             let right = self.parse_shift_expr()?;
-            left = ast::CompExprNode::Comp(
+            left = ast::CompExpr::Comp(
                 Box::new(left),
                 comp_op, // < or > or ==
                 right,
@@ -395,13 +395,13 @@ impl<'a> Parser<'a> {
 
     // shift-expr -> add-expr | shift-expr • shift-op • add-expr
     // shift-op -> T_SHIFTLEFT | T_SHIFTRIGHT
-    fn parse_shift_expr(&mut self) -> Result<ast::ShiftExprNode, ParseError> {
-        let mut left = ast::ShiftExprNode::Add(self.parse_add_expr()?);
+    fn parse_shift_expr(&mut self) -> Result<ast::ShiftExpr, ParseError> {
+        let mut left = ast::ShiftExpr::Add(self.parse_add_expr()?);
 
         while let Some(shift_op @ (Token::ShiftLeft | Token::ShiftRight)) = self.peek().cloned() {
             self.advance();
             let right = self.parse_add_expr()?;
-            left = ast::ShiftExprNode::Shift(
+            left = ast::ShiftExpr::Shift(
                 Box::new(left),
                 shift_op, // << or >>
                 right,
@@ -413,13 +413,13 @@ impl<'a> Parser<'a> {
 
     // add-expr -> mul-expr | add-expr • add-op • mul-expr
     // add-op -> T_ADDOP | T_SUBOP
-    fn parse_add_expr(&mut self) -> Result<ast::AddExprNode, ParseError> {
-        let mut left = ast::AddExprNode::Mul(self.parse_mul_expr()?);
+    fn parse_add_expr(&mut self) -> Result<ast::AddExpr, ParseError> {
+        let mut left = ast::AddExpr::Mul(self.parse_mul_expr()?);
 
         while let Some(add_op @ (Token::AddOp | Token::SubOp)) = self.peek().cloned() {
             self.advance();
             let right = self.parse_mul_expr()?;
-            left = ast::AddExprNode::Add(
+            left = ast::AddExpr::Add(
                 Box::new(left),
                 add_op, // + or -
                 right,
@@ -431,14 +431,14 @@ impl<'a> Parser<'a> {
 
     // mul-expr -> exp-expr | mul-expr • mul-op • exp-expr
     // mul-op -> T_MULOP | T_DIVOP | T_MODOP
-    fn parse_mul_expr(&mut self) -> Result<ast::MulExprNode, ParseError> {
-        let mut left = ast::MulExprNode::Exp(self.parse_exp_expr()?);
+    fn parse_mul_expr(&mut self) -> Result<ast::MulExpr, ParseError> {
+        let mut left = ast::MulExpr::Exp(self.parse_exp_expr()?);
 
         while let Some(mul_op @ (Token::MulOp | Token::DivOp | Token::ModOp)) = self.peek().cloned()
         {
             self.advance();
             let right = self.parse_exp_expr()?;
-            left = ast::MulExprNode::Mul(
+            left = ast::MulExpr::Mul(
                 Box::new(left),
                 mul_op, // * or / or %
                 right,
@@ -449,20 +449,20 @@ impl<'a> Parser<'a> {
     }
 
     // exp-expr -> unary-expr | exp-expr • T_EXPOP • unary-expr
-    fn parse_exp_expr(&mut self) -> Result<ast::ExpExprNode, ParseError> {
+    fn parse_exp_expr(&mut self) -> Result<ast::ExpExpr, ParseError> {
         // CHECK: this should be right-associative
         todo!();
     }
 
     // unary-expr -> primary | unary-op • unary-expr
     // unary-op -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
-    fn parse_unary_expr(&mut self) -> Result<ast::UnaryExprNode, ParseError> {
+    fn parse_unary_expr(&mut self) -> Result<ast::UnaryExpr, ParseError> {
         // CHECK: this should be right-associative
         todo!();
     }
 
     // primary-expr -> T_IDENTIFIER | T_INTLIT | T_FLOATLIT | T_STRINGLIT | T_PARENL • expr • T_PARENR | fn-call
-    fn parse_primary_expr(&mut self) -> Result<ast::PrimaryExprNode, ParseError> {
+    fn parse_primary_expr(&mut self) -> Result<ast::PrimaryExpr, ParseError> {
         if self.peek().is_none() {
             return Err(ParseError::UnexpectedEOF);
         }
@@ -470,26 +470,26 @@ impl<'a> Parser<'a> {
         match self.peek().unwrap() {
             Token::Identifier(_) => {
                 if self.peek_next() == Some(&Token::ParenL) {
-                    return Ok(ast::PrimaryExprNode::Call(self.parse_fn_call()?));
+                    return Ok(ast::PrimaryExpr::Call(self.parse_fn_call()?));
                 }
 
                 let ident = self.consume_identifier()?;
-                Ok(ast::PrimaryExprNode::Ident(Token::Identifier(ident)))
+                Ok(ast::PrimaryExpr::Ident(Token::Identifier(ident)))
             }
 
             Token::IntLit(_) => {
                 let intlit = self.consume_intlit()?;
-                Ok(ast::PrimaryExprNode::IntLit(Token::IntLit(intlit)))
+                Ok(ast::PrimaryExpr::IntLit(Token::IntLit(intlit)))
             }
 
             Token::FloatLit(_) => {
                 let floatlit = self.consume_floatlit()?;
-                Ok(ast::PrimaryExprNode::FloatLit(Token::FloatLit(floatlit)))
+                Ok(ast::PrimaryExpr::FloatLit(Token::FloatLit(floatlit)))
             }
 
             Token::StringLit(_) => {
                 let str = self.consume_stringlit()?;
-                Ok(ast::PrimaryExprNode::StringLit(Token::StringLit(str)))
+                Ok(ast::PrimaryExpr::StringLit(Token::StringLit(str)))
             }
 
             Token::ParenL => {
@@ -497,7 +497,7 @@ impl<'a> Parser<'a> {
                 let expr = self.parse_expr()?;
                 self.consume(Token::ParenR)?;
 
-                Ok(ast::PrimaryExprNode::Paren(
+                Ok(ast::PrimaryExpr::Paren(
                     Token::ParenL,
                     Box::new(expr),
                     Token::ParenR,
@@ -509,13 +509,13 @@ impl<'a> Parser<'a> {
     }
 
     // fn-call -> T_IDENTIFIER • T_PARENL • fn-args • T_PARENR
-    fn parse_fn_call(&mut self) -> Result<ast::FnCallNode, ParseError> {
+    fn parse_fn_call(&mut self) -> Result<ast::FnCall, ParseError> {
         let ident = self.consume_identifier()?;
         self.consume(Token::ParenL)?;
         let args = self.parse_fn_args()?;
         self.consume(Token::ParenR)?;
 
-        Ok(ast::FnCallNode {
+        Ok(ast::FnCall {
             i: Token::Identifier(ident),
             pl: Token::ParenL,
             a: args,
@@ -524,8 +524,8 @@ impl<'a> Parser<'a> {
     }
 
     // fn-args -> expr | expr • T_COMMA • fn-args | EPSILON
-    fn parse_fn_args(&mut self) -> Result<ast::FnArgsNode, ParseError> {
-        let mut params: Vec<ast::ExprNode> = Vec::new(); // Epsilon
+    fn parse_fn_args(&mut self) -> Result<ast::FnArgs, ParseError> {
+        let mut params: Vec<ast::Expr> = Vec::new(); // Epsilon
 
         // Epsilon
         if let Some(Token::ParenR) = self.peek() {
