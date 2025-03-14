@@ -15,7 +15,7 @@ pub enum ParseError {
 
 pub fn parse_token_stream(tokens: &Vec<Token>) -> Result<ast::TranslationUnit, ParseError> {
     let mut p = Parser::new(tokens);
-    Ok(p.parse_translation_unit()?)
+    p.parse_translation_unit()
 }
 
 struct Parser<'a> {
@@ -60,11 +60,11 @@ impl<'a> Parser<'a> {
             return Err(ParseError::UnexpectedEOF);
         }
 
-        if self.accept(&expected) {
-            Ok(())
-        } else {
-            Err(ParseError::FailedToFindToken(expected.clone()))
+        if !self.accept(&expected) {
+            return Err(ParseError::FailedToFindToken(expected.clone()));
         }
+
+        Ok(())
     }
 
     fn consume_type_token(&mut self) -> Result<ast::Type, ParseError> {
@@ -319,7 +319,7 @@ impl<'a> Parser<'a> {
 
     // expr -> assign-expr
     fn parse_expr(&mut self) -> Result<ast::Expr, ParseError> {
-        Ok(self.parse_assign_expr()?)
+        self.parse_assign_expr()
     }
 
     // assign-expr -> bool-expr | bool-expr • T_ASSIGN • assign-expr
