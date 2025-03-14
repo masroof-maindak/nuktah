@@ -63,6 +63,17 @@ impl<'a> Parser<'a> {
         }
     }
 
+    fn consume_type_token(&mut self) -> Result<ast::Type, ParseError> {
+        if let Some(t) = self.peek().cloned() {
+            if [Token::Int, Token::String, Token::Float].contains(&t) {
+                self.advance();
+                return Ok(t);
+            }
+        }
+
+        Err(ParseError::ExpectedTypeToken)
+    }
+
     fn consume_identifier(&mut self) -> Result<String, ParseError> {
         match self.token_stream.get(self.pos) {
             Some(Token::Identifier(x)) => {
@@ -107,20 +118,6 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn get_type_token(&self) -> Option<ast::Type> {
-        match self.peek() {
-            Some(token) => match token {
-                Token::Int => Some(Token::Int),
-                Token::String => Some(Token::String),
-                Token::Float => Some(Token::Float),
-                _ => None,
-            },
-            None => None,
-        }
-    }
-
-    // ----------------------------------- //
-
     // translation-unit -> decl-list
     fn parse_translation_unit(&mut self) -> Result<ast::TranslationUnit, ParseError> {
         self.parse_decl_list()
@@ -130,17 +127,9 @@ impl<'a> Parser<'a> {
     fn parse_decl_list(&mut self) -> Result<ast::DeclList, ParseError> {
         let mut root = Vec::new();
 
-        // CHECK: Not too sure about this one.
         while self.pos < self.token_stream.len() {
-            match self.peek() {
-                Some(_) => {
-                    let decl = self.parse_decl()?;
-                    root.push(decl);
-                }
-                None => {
-                    break;
-                }
-            }
+            let decl = self.parse_decl()?;
+            root.push(decl);
         }
 
         Ok(root)
@@ -148,7 +137,7 @@ impl<'a> Parser<'a> {
 
     // decl -> var-decl | fn-decl
     fn parse_decl(&mut self) -> Result<ast::Decl, ParseError> {
-        if self.peek() == Some(&Token::Function) {
+        if let Some(Token::Function) = self.peek() {
             Ok(ast::Decl::Fn(self.parse_fn_decl()?))
         } else {
             Ok(ast::Decl::Var(self.parse_var_decl()?))
@@ -158,7 +147,7 @@ impl<'a> Parser<'a> {
     // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block
     fn parse_fn_decl(&mut self) -> Result<ast::FnDecl, ParseError> {
         self.consume(Token::Function)?;
-        let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
+        let type_token = self.consume_type_token()?;
         let ident = self.consume_identifier()?;
         self.consume(Token::ParenL)?;
         let params = self.parse_params()?;
@@ -178,7 +167,7 @@ impl<'a> Parser<'a> {
 
     // var-decl -> type • T_IDENTIFIER • T_ASSIGN • expr-stmt
     fn parse_var_decl(&mut self) -> Result<ast::VarDecl, ParseError> {
-        let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
+        let type_token = self.consume_type_token()?;
         let ident = self.consume_identifier()?;
         self.consume(Token::AssignOp)?;
         let expr_stmt = self.parse_expr_stmt()?;
@@ -211,7 +200,7 @@ impl<'a> Parser<'a> {
 
     // param -> type • T_IDENTIFIER
     fn parse_param(&mut self) -> Result<ast::Param, ParseError> {
-        let type_token = self.get_type_token().ok_or(ParseError::ExpectedTypeToken)?;
+        let type_token = self.consume_type_token()?;
         let ident = self.consume_identifier()?;
 
         Ok(ast::Param {
