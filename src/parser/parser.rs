@@ -323,10 +323,24 @@ impl<'a> Parser<'a> {
         Ok(self.parse_assign_expr()?)
     }
 
-    // assign-expr -> bool-expr | assign-expr • T_ASSIGN • bool-expr
+    // assign-expr -> bool-expr | bool-expr • T_ASSIGN • assign-expr
     fn parse_assign_expr(&mut self) -> Result<ast::AssignExpr, ParseError> {
-        // CHECK: this should be right-associative
-        todo!();
+        let left = self.parse_bool_expr()?;
+        let ret: ast::AssignExpr;
+
+        // NOTE: the idea is that the right hand side, by virtue of a recursive call, will
+        // automatically resolve another assignment expression -- and this would naturally
+        // comprise the right tree
+
+        if let Some(Token::AssignOp) = self.peek() {
+            self.advance();
+            let right = self.parse_assign_expr()?;
+            ret = ast::AssignExpr::Assign(left, Token::AssignOp, Box::new(right));
+        } else {
+            ret = ast::AssignExpr::Bool(left);
+        }
+
+        Ok(ret)
     }
 
     // bool-expr -> bitwise-or-expr | bool-expr • bool_op • bitwise-or-expr
@@ -448,17 +462,33 @@ impl<'a> Parser<'a> {
         Ok(left)
     }
 
-    // exp-expr -> unary-expr | exp-expr • T_EXPOP • unary-expr
+    // exp-expr -> unary-expr | unary-expr • T_EXPOP • exp-expr
     fn parse_exp_expr(&mut self) -> Result<ast::ExpExpr, ParseError> {
-        // CHECK: this should be right-associative
-        todo!();
+        let left = self.parse_unary_expr()?;
+        let ret: ast::ExpExpr;
+
+        if let Some(Token::ExpOp) = self.peek() {
+            self.advance();
+            let right = self.parse_exp_expr()?;
+            ret = ast::ExpExpr::Exp(left, Token::AssignOp, Box::new(right));
+        } else {
+            ret = ast::ExpExpr::Unary(left);
+        }
+
+        Ok(ret)
     }
 
     // unary-expr -> primary | unary-op • unary-expr
     // unary-op -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
     fn parse_unary_expr(&mut self) -> Result<ast::UnaryExpr, ParseError> {
-        // CHECK: this should be right-associative
-        todo!();
+        match self.peek().cloned() {
+            Some(t @ (Token::SubOp | Token::BooleanNot | Token::BitwiseNot)) => {
+                self.advance();
+                let right = self.parse_unary_expr()?;
+                return Ok(ast::UnaryExpr::Unary(t, Box::new(right)));
+            }
+            _ => return Ok(ast::UnaryExpr::Primary(self.parse_primary_expr()?)),
+        }
     }
 
     // primary-expr -> T_IDENTIFIER | T_INTLIT | T_FLOATLIT | T_STRINGLIT | T_PARENL • expr • T_PARENR | fn-call

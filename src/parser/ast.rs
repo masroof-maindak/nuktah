@@ -101,9 +101,9 @@ pub type Expr = AssignExpr;
 pub enum AssignExpr {
     Bool(BoolExpr),
     Assign(
-        Box<AssignExpr>,
-        Token, // AssignOp
         BoolExpr,
+        Token, // AssignOp
+        Box<AssignExpr>,
     ),
 }
 
@@ -181,9 +181,9 @@ pub enum MulExpr {
 pub enum ExpExpr {
     Unary(UnaryExpr),
     Exp(
-        Box<ExpExpr>,
-        Token, // ExpOp
         UnaryExpr,
+        Token, // ExpOp
+        Box<ExpExpr>,
     ),
 }
 
