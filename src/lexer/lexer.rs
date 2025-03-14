@@ -13,6 +13,12 @@ pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
     while idx < src.len() {
         let word = strtok(src, DELIM, &mut idx);
         let mut t = identify_token(word, quotes_started)?;
+
+        // TODO: implement comment consolidation and removal at this part
+        if t == Token::Whitespace || t == Token::Newline {
+            continue;
+        }
+
         consolidate_tokens(&mut token_list, &mut t, quotes_started);
 
         if t == Token::Quotes {

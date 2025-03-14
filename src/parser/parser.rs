@@ -118,6 +118,10 @@ impl<'a> Parser<'a> {
         }
     }
 
+    // FIXME: currently getting a deeply-nested list with the `primary-expr` at the very end
+    // Can we get rid of this? One approach might be to convert every intermediate expression
+    // to an AstNode
+
     // translation-unit -> decl-list
     fn parse_translation_unit(&mut self) -> Result<ast::TranslationUnit, ParseError> {
         self.parse_decl_list()
@@ -144,6 +148,7 @@ impl<'a> Parser<'a> {
         }
     }
 
+    // FIXME: `fn int a() {} .` returns a `ParserError(ExpectedTypeToken)`
     // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PARENL • params • T_PARENR • block
     fn parse_fn_decl(&mut self) -> Result<ast::FnDecl, ParseError> {
         self.consume(Token::Function)?;
