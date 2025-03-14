@@ -3,7 +3,10 @@ use crate::lexer::token::Token;
 const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 
 #[derive(Debug)]
-pub enum LexerError {}
+pub enum LexerError {
+    UnterminatedStringLit,
+    InvalidCharacter(String)
+}
 
 pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
     let mut token_list: Vec<Token> = Vec::new();
@@ -114,8 +117,8 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
                 return Ok(Token::IntLit(n));
             }
 
-            if let Ok(n) = word.parse::<f64>() {
-                return Ok(Token::FloatLit(n));
+            if !word.chars().all(|c| c.is_alphabetic()) {
+                return Err(LexerError::InvalidCharacter(word.to_string()));
             }
 
             return Ok(Token::Identifier(word.to_string()));
@@ -123,45 +126,56 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
     }
 }
 
-fn consolidate_tokens(token_list: &mut Vec<Token>, t: &mut Token, quotes_started: bool) {
+fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quotes_started: bool) {
     if token_list.is_empty()
-        || ![
-            Token::AddOp,
-            Token::SubOp,
-            Token::AssignOp,
-            Token::Whitespace,
-            Token::Quotes,
-            Token::LessThan,
-            Token::GreaterThan,
-            Token::BitwiseAnd,
-            Token::BitwiseOr,
-        ]
-        .contains(t)
+        || match curr_token {
+            Token::AddOp
+            | Token::SubOp
+            | Token::AssignOp
+            | Token::Whitespace
+            | Token::Quotes
+            | Token::LessThan
+            | Token::GreaterThan
+            | Token::BitwiseAnd
+            | Token::BitwiseOr
+            | Token::StringLit(_) => false,
+            _ => true,
+        }
     {
         return;
     }
 
     let last_token = token_list.last().unwrap();
 
-    // Literal quotes
-    if *last_token == Token::StringLit("\\".to_string()) && *t == Token::Quotes {
-        token_list.pop();
-        *t = Token::StringLit("\\\"".to_string());
-        return;
+    // If the last token is a string literal
+    if let Token::StringLit(last_str) = last_token.clone() {
+        // if the current token is a string literal, combine them
+        if let Token::StringLit(curr_str) = curr_token {
+            token_list.pop();
+            *curr_token = Token::StringLit(last_str + curr_str);
+            return;
+        }
+
+        // if the current token is a quote, and the last string literal ends with a backslash, combine them
+        if *curr_token == Token::Quotes && last_str.ends_with('\\') {
+            token_list.pop();
+            *curr_token = Token::StringLit(last_str + "\"");
+            return;
+        }
     }
 
-    // ++, --, ==, <<, >>, &&, ||
-    if *last_token == *t {
+    // ==, <<, >>, &&, || from =, <, >, &, |
+    if *last_token == *curr_token {
         //  qs - !ws => POP
         // !qs - !ws => POP
         // !qs -  ws => POP
         //  qs -  ws => NO POP
 
-        if *t != Token::Whitespace || !quotes_started {
+        if *curr_token != Token::Whitespace || !quotes_started {
             token_list.pop();
         }
 
-        *t = match *t {
+        *curr_token = match *curr_token {
             Token::AssignOp => Token::EqualsOp,
             Token::LessThan => Token::ShiftLeft,
             Token::GreaterThan => Token::ShiftRight,
