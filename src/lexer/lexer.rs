@@ -5,22 +5,29 @@ const DELIM: &[u8] = b" \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 #[derive(Debug)]
 pub enum LexerError {
     UnterminatedStringLit,
-    InvalidCharacter(String)
+    InvalidCharacter(String),
 }
 
 pub fn tokenize_src_code(src: &String) -> Result<Vec<Token>, LexerError> {
     let mut token_list: Vec<Token> = Vec::new();
     let mut idx = 0;
     let mut quotes_started = false;
+    let mut comment_started = false;
 
     while idx < src.len() {
         let word = strtok(src, DELIM, &mut idx);
         let mut t = identify_token(word, quotes_started)?;
 
-        // TODO: combine `intlit • dot • intlit` into `floatlit`
+        // if comment started, ignore all tokens until newline
+        if comment_started {
+            match t {
+                Token::Newline => comment_started = false,
+                _ => continue,
+            }
+        }
 
-        // TODO: implement comment consolidation and removal at this part
-        if t == Token::Whitespace || t == Token::Newline {
+        if t == Token::Comment {
+            comment_started = true;
             continue;
         }
 
