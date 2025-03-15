@@ -1,13 +1,11 @@
 use crate::lexer::token::Token;
 
-#[derive(Debug)]
-pub enum AstNode {
-    TranslationUnit(TranslationUnit),
-}
-
 pub type TranslationUnit = DeclList;
 
-pub type DeclList = Vec<Decl>;
+#[derive(Debug)]
+pub struct DeclList {
+    pub decls: Vec<Decl>,
+}
 
 #[derive(Debug)]
 pub enum Decl {
@@ -38,6 +36,7 @@ pub struct FnDecl {
 pub type Type = Token; // {Int,String,Float}Lit
 
 pub type Params = Vec<Param>;
+
 #[derive(Debug)]
 pub struct Param {
     pub t: Type,
@@ -98,7 +97,6 @@ pub struct ExprStmt {
 
 pub type Expr = AssignExpr;
 
-#[derive(Debug)]
 pub enum AssignExpr {
     Bool(BoolExpr),
     Assign(
@@ -108,7 +106,6 @@ pub enum AssignExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum BoolExpr {
     BitOr(BitOrExpr),
     Bool(
@@ -118,7 +115,6 @@ pub enum BoolExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum BitOrExpr {
     BitAnd(BitAndExpr),
     BitOr(
@@ -128,7 +124,6 @@ pub enum BitOrExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum BitAndExpr {
     Comp(CompExpr),
     BitAnd(
@@ -138,7 +133,6 @@ pub enum BitAndExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum CompExpr {
     Shift(ShiftExpr),
     Comp(
@@ -148,7 +142,6 @@ pub enum CompExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum ShiftExpr {
     Add(AddExpr),
     Shift(
@@ -158,7 +151,6 @@ pub enum ShiftExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum AddExpr {
     Mul(MulExpr),
     Add(
@@ -168,7 +160,6 @@ pub enum AddExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum MulExpr {
     Exp(ExpExpr),
     Mul(
@@ -178,7 +169,6 @@ pub enum MulExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum ExpExpr {
     Unary(UnaryExpr),
     Exp(
@@ -188,7 +178,6 @@ pub enum ExpExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum UnaryExpr {
     Primary(PrimaryExpr),
     Unary(
@@ -197,7 +186,6 @@ pub enum UnaryExpr {
     ),
 }
 
-#[derive(Debug)]
 pub enum PrimaryExpr {
     IntLit(Token),
     FloatLit(Token),
@@ -215,7 +203,7 @@ pub enum PrimaryExpr {
 pub struct FnCall {
     pub i: Token,  // Identifier
     pub pl: Token, // ParenL
-    pub a: FnArgs,
+    pub args: FnArgs,
     pub pr: Token, // ParenR
 }
 
