@@ -75,10 +75,11 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
     }
 
     match word {
-        "for" => Ok(Token::For),
-        "if" => Ok(Token::If),
-        "else" => Ok(Token::Else),
-        "ret" => Ok(Token::Return),
+        "duhrao" => Ok(Token::For),
+        "agar" => Ok(Token::If),
+        "warna" => Ok(Token::Else),
+        "wapsi" => Ok(Token::Return),
+        "dhancha" => Ok(Token::Struct),
 
         "int" => Ok(Token::Int),
         "float" => Ok(Token::Float),

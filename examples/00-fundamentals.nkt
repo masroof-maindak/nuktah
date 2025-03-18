@@ -6,7 +6,10 @@ $ Literals
 "hello \" نقط!"
 
 $ Keywords
-for ret if else
+duhrao wapsi agar warna dhancha
+
+$ Types
+int float string
 
 $ Operators
 + - * / % ^ (exponentiation!) & | ~ ! = == != < > <= >= && ||

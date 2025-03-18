@@ -5,6 +5,7 @@ pub enum Token {
     If,
     Else,
     Return,
+    Struct,
 
     // int, str, float, fn
     Int,
