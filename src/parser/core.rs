@@ -293,6 +293,8 @@ impl<'a> Parser<'a> {
         let expr = self.parse_expr()?;
         self.consume(Token::Dot)?;
 
+        // FIXME: empty expr-stmt should be allowed
+
         Ok(expr)
     }
 
