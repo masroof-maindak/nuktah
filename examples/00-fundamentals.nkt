@@ -2,14 +2,14 @@ $ Comments!
 
 $ Literals
 10
-1.2 $FIXME!
+1.2 $FIXME
 "hello \" نقط!"
 
 $ Keywords
 duhrao wapsi agar warna dhancha
 
 $ Types
-int float string
+ginti asharia jumla
 
 $ Operators
 + - * / % ^ (exponentiation!) & | ~ ! = == != < > <= >= && ||

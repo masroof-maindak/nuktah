@@ -81,9 +81,9 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
         "wapsi" => Ok(Token::Return),
         "dhancha" => Ok(Token::Struct),
 
-        "int" => Ok(Token::Int),
-        "float" => Ok(Token::Float),
-        "string" => Ok(Token::String),
+        "ginti" => Ok(Token::Int),
+        "asharia" => Ok(Token::Float),
+        "jumla" => Ok(Token::String),
         "fn" => Ok(Token::Function),
 
         "(" => Ok(Token::ParenL),
