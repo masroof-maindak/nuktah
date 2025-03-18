@@ -486,9 +486,9 @@ impl<'a> Parser<'a> {
             Some(t @ (Token::SubOp | Token::BooleanNot | Token::BitwiseNot)) => {
                 self.advance();
                 let right = self.parse_unary_expr()?;
-                return Ok(ast::core::UnaryExpr::Unary(t, Box::new(right)));
+                Ok(ast::core::UnaryExpr::Unary(t, Box::new(right)))
             }
-            _ => return Ok(ast::core::UnaryExpr::Primary(self.parse_primary_expr()?)),
+            _ => Ok(ast::core::UnaryExpr::Primary(self.parse_primary_expr()?)),
         }
     }
 

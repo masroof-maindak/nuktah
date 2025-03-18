@@ -42,7 +42,7 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
         token_list.push(t);
     }
 
-    token_list.retain(|t| ![Token::Whitespace, Token::Newline].contains(&t));
+    token_list.retain(|t| ![Token::Whitespace, Token::Newline].contains(t));
     Ok(token_list)
 }
 
@@ -62,7 +62,7 @@ fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
         .sum();
 
     *idx += byte_count;
-    return &remaining_text[..byte_count];
+    &remaining_text[..byte_count]
 }
 
 fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError> {
@@ -143,19 +143,19 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
 
 fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quotes_started: bool) {
     if token_list.is_empty()
-        || match curr_token {
+        || !matches!(
+            curr_token,
             Token::AddOp
-            | Token::SubOp
-            | Token::AssignOp
-            | Token::Whitespace
-            | Token::Quotes
-            | Token::LessThan
-            | Token::GreaterThan
-            | Token::BitwiseAnd
-            | Token::BitwiseOr
-            | Token::StringLit(_) => false,
-            _ => true,
-        }
+                | Token::SubOp
+                | Token::AssignOp
+                | Token::Whitespace
+                | Token::Quotes
+                | Token::LessThan
+                | Token::GreaterThan
+                | Token::BitwiseAnd
+                | Token::BitwiseOr
+                | Token::StringLit(_)
+        )
     {
         return;
     }
