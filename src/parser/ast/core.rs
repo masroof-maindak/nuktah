@@ -2,10 +2,7 @@ use crate::lexer::token::Token;
 
 pub type TranslationUnit = DeclList;
 
-#[derive(Debug)]
-pub struct DeclList {
-    pub decls: Vec<Decl>,
-}
+pub type DeclList = Vec<Decl>;
 
 #[derive(Debug)]
 pub enum Decl {
@@ -17,25 +14,23 @@ pub enum Decl {
 pub struct VarDecl {
     pub t: Type,
     pub i: Token, // Identifier,
-    pub a: Token, // AssignOp,
-    pub e: ExprStmt,
+    // AssignOp,
+    pub e: Expr,
 }
 
 #[derive(Debug)]
 pub struct FnDecl {
-    pub f: Token, // Func
+    // Fn
     pub t: Type,
-    pub i: Token,  // Identifier,
-    pub pl: Token, // ParenL,
-    pub p: Params,
-    pub pr: Token, // ParenR,
+    pub i: Token, // Identifier,
+    // ParenL,
+    pub p: Vec<Param>,
+    // ParenR,
     pub b: Block,
-    pub d: Token, // Dot
+    // Dot
 }
 
 pub type Type = Token; // {Int,String,Float}Lit
-
-pub type Params = Vec<Param>;
 
 #[derive(Debug)]
 pub struct Param {
@@ -43,14 +38,7 @@ pub struct Param {
     pub i: Token, // Identifier
 }
 
-#[derive(Debug)]
-pub struct Block {
-    pub l: Token, // BraceL
-    pub s: Stmts,
-    pub r: Token, // BraceR
-}
-
-pub type Stmts = Vec<Stmt>;
+pub type Block = Vec<Stmt>;
 
 #[derive(Debug)]
 pub enum Stmt {
@@ -58,42 +46,34 @@ pub enum Stmt {
     If(IfStmt),
     Ret(RetStmt),
     VarDecl(VarDecl),
-    ExprStmt(ExprStmt),
+    ExprStmt(Expr),
 }
 
 #[derive(Debug)]
 pub struct ForStmt {
-    pub f: Token,  // For
-    pub pl: Token, // ParenL
+    pub f: Token, // For
+    // ParenL
     pub init: VarDecl,
-    pub cond: ExprStmt,
+    pub cond: Expr,
     pub inc: Expr,
-    pub pr: Token, // ParenR
+    // ParenR
     pub b: Block,
 }
 
 #[derive(Debug)]
 pub struct IfStmt {
-    pub i: Token,  // If
-    pub pl: Token, // ParenL
+    // If
+    // ParenL
     pub e: Expr,
-    pub pr: Token, // ParenR
+    // ParenR
     pub ib: Block,
-    pub el: Token, // Else
+    // Else
     pub eb: Block,
 }
 
-#[derive(Debug)]
-pub struct RetStmt {
-    pub r: Token, // Ret
-    pub e: ExprStmt,
-}
+pub type RetStmt = Expr;
 
-#[derive(Debug)]
-pub struct ExprStmt {
-    pub e: Expr,
-    pub s: Token, // Dot,
-}
+// expr stmt -> expr t_dot (thus unnecessary in *abstract* syntax tree)
 
 pub type Expr = AssignExpr;
 
@@ -101,7 +81,7 @@ pub enum AssignExpr {
     Bool(BoolExpr),
     Assign(
         BoolExpr,
-        Token, // AssignOp
+        // AssignOp
         Box<AssignExpr>,
     ),
 }
@@ -119,7 +99,7 @@ pub enum BitOrExpr {
     BitAnd(BitAndExpr),
     BitOr(
         Box<BitOrExpr>,
-        Token, // BitwiseOr
+        // BitwiseOr
         BitAndExpr,
     ),
 }
@@ -128,7 +108,7 @@ pub enum BitAndExpr {
     Comp(CompExpr),
     BitAnd(
         Box<BitAndExpr>,
-        Token, // BitwiseAnd
+        // BitwiseAnd
         CompExpr,
     ),
 }
@@ -173,7 +153,7 @@ pub enum ExpExpr {
     Unary(UnaryExpr),
     Exp(
         UnaryExpr,
-        Token, // ExpOp
+        // ExpOp
         Box<ExpExpr>,
     ),
 }
@@ -192,19 +172,19 @@ pub enum PrimaryExpr {
     StringLit(Token),
     Ident(Token),
     Paren(
-        Token, // ParenL
+        // ParenL
         Box<Expr>,
-        Token, // ParenR
+        // ParenR
     ),
     Call(FnCall),
 }
 
 #[derive(Debug)]
 pub struct FnCall {
-    pub i: Token,  // Identifier
-    pub pl: Token, // ParenL
+    pub i: Token, // Identifier
+    // ParenL
     pub args: FnArgs,
-    pub pr: Token, // ParenR
+    // ParenR
 }
 
 pub type FnArgs = Vec<Expr>;

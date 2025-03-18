@@ -140,7 +140,7 @@ impl<'a> Parser<'a> {
             root.push(decl);
         }
 
-        Ok(ast::core::DeclList { decls: root })
+        Ok(root)
     }
 
     // decl -> var-decl | fn-decl
@@ -164,14 +164,10 @@ impl<'a> Parser<'a> {
         self.consume(Token::Dot)?;
 
         Ok(ast::core::FnDecl {
-            f: Token::Function,
             t: type_token,
             i: Token::Identifier(ident),
-            pl: Token::ParenL,
             p: params,
-            pr: Token::ParenR,
             b: block,
-            d: Token::Dot,
         })
     }
 
@@ -185,13 +181,12 @@ impl<'a> Parser<'a> {
         Ok(ast::core::VarDecl {
             t: type_token,
             i: Token::Identifier(ident),
-            a: Token::AssignOp,
             e: expr_stmt,
         })
     }
 
     // params -> param | param • T_COMMA • params | EPSILON
-    fn parse_params(&mut self) -> Result<ast::core::Params, ParseError> {
+    fn parse_params(&mut self) -> Result<Vec<ast::core::Param>, ParseError> {
         let mut params: Vec<ast::core::Param> = Vec::new();
 
         if let Some(Token::ParenR) = self.peek() {
@@ -225,16 +220,12 @@ impl<'a> Parser<'a> {
         let stmts = self.parse_stmts()?;
         self.consume(Token::BraceR)?;
 
-        Ok(ast::core::Block {
-            l: Token::BraceL,
-            s: stmts,
-            r: Token::BraceR,
-        })
+        Ok(stmts)
     }
 
     // stmts -> stmt • stmts | EPSILON
     // stmt -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt
-    fn parse_stmts(&mut self) -> Result<ast::core::Stmts, ParseError> {
+    fn parse_stmts(&mut self) -> Result<Vec<ast::core::Stmt>, ParseError> {
         let mut stmts: Vec<ast::core::Stmt> = Vec::new();
 
         while let Some(t) = self.peek() {
@@ -265,11 +256,9 @@ impl<'a> Parser<'a> {
 
         Ok(ast::core::ForStmt {
             f: Token::For,
-            pl: Token::ParenL,
             init,
             cond,
             inc: incr,
-            pr: Token::ParenR,
             b: block,
         })
     }
@@ -285,12 +274,8 @@ impl<'a> Parser<'a> {
         let else_block = self.parse_block()?;
 
         Ok(ast::core::IfStmt {
-            i: Token::If,
-            pl: Token::ParenL,
             e: cond,
-            pr: Token::ParenR,
             ib: if_block,
-            el: Token::Else,
             eb: else_block,
         })
     }
@@ -300,21 +285,15 @@ impl<'a> Parser<'a> {
         self.consume(Token::Return)?;
         let expr_stmt = self.parse_expr_stmt()?;
 
-        Ok(ast::core::RetStmt {
-            r: Token::Return,
-            e: expr_stmt,
-        })
+        Ok(expr_stmt)
     }
 
     // expr-stmt -> expr • T_Dot
-    fn parse_expr_stmt(&mut self) -> Result<ast::core::ExprStmt, ParseError> {
+    fn parse_expr_stmt(&mut self) -> Result<ast::core::Expr, ParseError> {
         let expr = self.parse_expr()?;
         self.consume(Token::Dot)?;
 
-        Ok(ast::core::ExprStmt {
-            e: expr,
-            s: Token::Dot,
-        })
+        Ok(expr)
     }
 
     // expr -> assign-expr
@@ -334,7 +313,7 @@ impl<'a> Parser<'a> {
         if let Some(Token::AssignOp) = self.peek() {
             self.advance();
             let right = self.parse_assign_expr()?;
-            ret = ast::core::AssignExpr::Assign(left, Token::AssignOp, Box::new(right));
+            ret = ast::core::AssignExpr::Assign(left, Box::new(right));
         } else {
             ret = ast::core::AssignExpr::Bool(left);
         }
@@ -367,7 +346,7 @@ impl<'a> Parser<'a> {
         while let Some(Token::BitwiseOr) = self.peek().cloned() {
             self.advance();
             let right = self.parse_bitwise_and_expr()?;
-            left = ast::core::BitOrExpr::BitOr(Box::new(left), Token::BitwiseOr, right)
+            left = ast::core::BitOrExpr::BitOr(Box::new(left), right)
         }
 
         Ok(left)
@@ -380,7 +359,7 @@ impl<'a> Parser<'a> {
         while let Some(Token::BitwiseAnd) = self.peek().cloned() {
             self.advance();
             let right = self.parse_comp_expr()?;
-            left = ast::core::BitAndExpr::BitAnd(Box::new(left), Token::BitwiseAnd, right)
+            left = ast::core::BitAndExpr::BitAnd(Box::new(left), right)
         }
 
         Ok(left)
@@ -466,10 +445,11 @@ impl<'a> Parser<'a> {
         let left = self.parse_unary_expr()?;
         let ret: ast::core::ExpExpr;
 
-        if let Some(Token::ExpOp) = self.peek() {
+        // CHECK: do I need cloned() here or not?
+        if let Some(Token::ExpOp) = self.peek().cloned() {
             self.advance();
             let right = self.parse_exp_expr()?;
-            ret = ast::core::ExpExpr::Exp(left, Token::AssignOp, Box::new(right));
+            ret = ast::core::ExpExpr::Exp(left, Box::new(right));
         } else {
             ret = ast::core::ExpExpr::Unary(left);
         }
@@ -528,11 +508,7 @@ impl<'a> Parser<'a> {
                 let expr = self.parse_expr()?;
                 self.consume(Token::ParenR)?;
 
-                Ok(ast::core::PrimaryExpr::Paren(
-                    Token::ParenL,
-                    Box::new(expr),
-                    Token::ParenR,
-                ))
+                Ok(ast::core::PrimaryExpr::Paren(Box::new(expr)))
             }
 
             _ => Err(ParseError::UnexpectedToken(self.peek().unwrap().clone())),
@@ -548,9 +524,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::core::FnCall {
             i: Token::Identifier(ident),
-            pl: Token::ParenL,
             args,
-            pr: Token::ParenR,
         })
     }
 
