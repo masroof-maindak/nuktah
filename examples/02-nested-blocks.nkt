@@ -2,4 +2,6 @@ fn ginti some_fn() {
 	duhrao (ginti a = 0 . a < 10 . a = a + 1) {
 		agar (a == 5) {} warna {}
 	}
+
+	wapsi 5 .
 } .

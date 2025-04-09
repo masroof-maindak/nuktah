@@ -31,8 +31,6 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
             continue;
         }
 
-        // TODO: combine `intlit • dot • intlit` into `floatlit`
-
         consolidate_tokens(&mut token_list, &mut t, quotes_started);
 
         if t == Token::Quotes {
@@ -156,6 +154,7 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
                 | Token::BitwiseAnd
                 | Token::BitwiseOr
                 | Token::StringLit(_)
+                | Token::IntLit(_)
         )
     {
         return;
@@ -177,6 +176,24 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
             token_list.pop();
             *curr_token = Token::StringLit(last_str + "\"");
             return;
+        }
+    }
+
+    // CHECK: Could we clean this up?
+    if token_list.len() > 2 {
+        let last = token_list.get(token_list.len() - 1).unwrap();
+        let second_last = token_list.get(token_list.len() - 2).unwrap();
+
+        if let Token::IntLit(mantissa) = *second_last {
+            if let Token::IntLit(exponent) = *curr_token {
+                if *last == Token::Dot {
+                    token_list.pop();
+                    token_list.pop();
+                    let f = format!("{}.{}", mantissa, exponent);
+                    *curr_token = Token::FloatLit(f.parse::<f64>().unwrap());
+                    return;
+                }
+            }
         }
     }
 
