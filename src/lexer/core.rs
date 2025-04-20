@@ -179,21 +179,13 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
         }
     }
 
-    // CHECK: Could we clean this up?
-    if token_list.len() > 2 {
-        let last = token_list.get(token_list.len() - 1).unwrap();
-        let second_last = token_list.get(token_list.len() - 2).unwrap();
-
-        if let Token::IntLit(mantissa) = *second_last {
-            if let Token::IntLit(exponent) = *curr_token {
-                if *last == Token::Dot {
-                    token_list.pop();
-                    token_list.pop();
-                    let f = format!("{}.{}", mantissa, exponent);
-                    *curr_token = Token::FloatLit(f.parse::<f64>().unwrap());
-                    return;
-                }
-            }
+    if let [.., Token::IntLit(int_part), Token::Dot] = token_list[..] {
+        if let Token::IntLit(frac_part) = *curr_token {
+            token_list.pop();
+            token_list.pop();
+            let f = format!("{}.{}", int_part, frac_part);
+            *curr_token = Token::FloatLit(f.parse::<f64>().unwrap());
+            return;
         }
     }
 
