@@ -51,7 +51,7 @@ pub enum Stmt {
 
 #[derive(Debug)]
 pub struct ForStmt {
-    pub f: Token, // For
+    // For
     // ParenL
     pub init: VarDecl,
     pub cond: Expr,

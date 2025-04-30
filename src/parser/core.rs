@@ -248,14 +248,19 @@ impl<'a> Parser<'a> {
     fn parse_for_stmt(&mut self) -> Result<ast::core::ForStmt, ParseError> {
         self.consume(Token::For)?;
         self.consume(Token::ParenL)?;
+
+        // FIXME: empty expression should be acceptable
+        // TODO: Shrimple fix -> simply check if a semicolon is encountered first; if not, then
+        // attempt to evaluate an expression/expression statement/whatever.
+
         let init = self.parse_var_decl()?;
         let cond = self.parse_expr_stmt()?;
         let incr = self.parse_expr()?;
+
         self.consume(Token::ParenR)?;
         let block = self.parse_block()?;
 
         Ok(ast::core::ForStmt {
-            f: Token::For,
             init,
             cond,
             inc: incr,
@@ -292,8 +297,6 @@ impl<'a> Parser<'a> {
     fn parse_expr_stmt(&mut self) -> Result<ast::core::Expr, ParseError> {
         let expr = self.parse_expr()?;
         self.consume(Token::Dot)?;
-
-        // FIXME: empty expr-stmt should be allowed
 
         Ok(expr)
     }
@@ -447,8 +450,7 @@ impl<'a> Parser<'a> {
         let left = self.parse_unary_expr()?;
         let ret: ast::core::ExpExpr;
 
-        // CHECK: do I need cloned() here or not?
-        if let Some(Token::ExpOp) = self.peek().cloned() {
+        if let Some(Token::ExpOp) = self.peek() {
             self.advance();
             let right = self.parse_exp_expr()?;
             ret = ast::core::ExpExpr::Exp(left, Box::new(right));
