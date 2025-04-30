@@ -1,5 +1,6 @@
 pub mod lexer;
 pub mod parser;
+pub mod semantics;
 
 #[derive(Debug)]
 pub enum CompilerError {
