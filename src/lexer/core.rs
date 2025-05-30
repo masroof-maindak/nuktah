@@ -78,6 +78,7 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
         "warna" => Ok(Token::Else),
         "wapsi" => Ok(Token::Return),
         "dhancha" => Ok(Token::Struct),
+        "toro" => Ok(Token::Break),
 
         "ginti" => Ok(Token::Int),
         "asharia" => Ok(Token::Float),

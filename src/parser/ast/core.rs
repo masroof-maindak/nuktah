@@ -46,16 +46,17 @@ pub enum Stmt {
     If(IfStmt),
     Ret(RetStmt),
     VarDecl(VarDecl),
-    ExprStmt(Expr),
+    Expr(ExprStmt),
+    Break,
 }
 
 #[derive(Debug)]
 pub struct ForStmt {
     // For
     // ParenL
-    pub init: VarDecl,
-    pub cond: Expr,
-    pub inc: Expr,
+    pub init: Option<VarDecl>,
+    pub cond: ExprStmt,
+    pub updt: Expr,
     // ParenR
     pub b: Block,
 }
@@ -71,11 +72,17 @@ pub struct IfStmt {
     pub eb: Block,
 }
 
-pub type RetStmt = Expr;
+pub type RetStmt = ExprStmt;
 
 // expr stmt -> expr t_dot (thus unnecessary in *abstract* syntax tree)
 
-pub type Expr = AssignExpr;
+#[derive(Debug)]
+pub struct ExprStmt {
+    pub e: Expr,
+    // Dot
+}
+
+pub type Expr = Option<AssignExpr>;
 
 pub enum AssignExpr {
     Bool(BoolExpr),

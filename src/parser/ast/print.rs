@@ -3,6 +3,8 @@ use std::fmt;
 use crate::lexer::token::Token;
 use crate::parser::ast::core::*;
 
+// TODO: Use Macros or some shit and burn this entire file
+
 impl AssignExpr {
     fn fmt_with_indent(
         &self,
@@ -194,6 +196,18 @@ impl UnaryExpr {
     }
 }
 
+fn fmt_option_assign_expr(
+    expr: &Option<AssignExpr>,
+    f: &mut fmt::Formatter,
+    indent: usize,
+) -> fmt::Result {
+    let indent_str = " ".repeat(indent * 4);
+    match expr {
+        Some(e) => e.fmt_with_indent(f, indent),
+        None => write!(f, "\n{}<empty>", indent_str),
+    }
+}
+
 impl PrimaryExpr {
     fn fmt_with_indent(
         &self,
@@ -206,7 +220,7 @@ impl PrimaryExpr {
             PrimaryExpr::FloatLit(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::StringLit(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::Ident(e) => write!(f, "\n{}{:?}", indent_str, e),
-            PrimaryExpr::Paren(e) => e.fmt_with_indent(f, indent + 1),
+            PrimaryExpr::Paren(e) => fmt_option_assign_expr(e, f, indent + 1),
             PrimaryExpr::Call(fn_call) => {
                 write!(f, "\n{}Call({:#?})", indent_str, fn_call)
             }
