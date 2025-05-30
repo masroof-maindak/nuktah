@@ -6,10 +6,10 @@ $ Literals
 "hello \" نقط!"
 
 $ Keywords
-duhrao wapsi agar warna dhancha
+duhrao wapsi agar warna dhancha toro
 
 $ Types
-ginti asharia jumla
+ginti asharia jumla khali
 
 $ Operators
 + - * / % ^ (exponentiation!) & | ~ ! = == != < > <= >= && ||

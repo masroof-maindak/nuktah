@@ -7,7 +7,8 @@
 
 **var-decl**         -> type • T\_IDENTIFIER • T\_ASSIGN • expr-stmt<br>
 
-**fn-decl**          -> T\_FUNC • type • T\_IDENTIFIER • T\_PAREN\_L • params • T\_PAREN\_R • block • T\_DOT<br>
+**fn-decl**          -> T\_FUNC • fn-type • T\_IDENTIFIER • T\_PAREN\_L • params • T\_PAREN\_R • block • T\_DOT<br>
+**fn-type**          -> type | T\_VOID<br>
 **type**             -> T\_INT | T\_STRING | T\_FLOAT
 
 **params**           -> param | param • T\_COMMA • params | EPSILON<br>
@@ -18,12 +19,11 @@
 **stmt**             -> for-stmt | if-stmt | ret-stmt | var-decl | expr-stmt | break-stmt
 
 **for-stmt**         -> T\_FOR • T\_PAREN\_L • init • cond • updt • T\_PAREN\_R • block<br>
-**init**             -> var-decl | EPSILON<br>
-**cond**             -> expr-stmt | EPSILON<br>
+**init**             -> var-decl | T\_DOT<br>
+**cond**             -> expr-stmt<br>
 **updt**             -> expr | EPSILON
 
-// mandatory else<br>
-**if-stmt**          -> T\_IF • T\_PAREN\_L • expr • T\_PAREN\_R • block • T\_ELSE • block<br>
+**if-stmt**          -> T\_IF • T\_PAREN\_L • expr • T\_PAREN\_R • block • T\_ELSE • block // (mandatory else!)<br>
 
 **ret-stmt**         -> T\_RET • expr-stmt
 
@@ -61,11 +61,3 @@
 
 **fn-call**          -> T\_IDENTIFIER • T\_PAREN\_L • fn-args • T\_PAREN\_R<br>
 **fn-args**          -> expr | expr • T\_COMMA • fn-args | EPSILON
-
-## Acknowledgements
-
-- The Dragon Book
-- [C's grammar](https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm)
-- [Simple but Powerful Pratt Parsing - Matklad](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
-- [Parsing Expressions by Precedence Climbing - Eli Bendersky](https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing)
-- [Parsing Expressions by Recursive Descent - Theodore Norvell](https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm)

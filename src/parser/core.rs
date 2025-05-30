@@ -68,7 +68,7 @@ impl<'a> Parser<'a> {
         Ok(())
     }
 
-    fn consume_type_token(&mut self) -> Result<ast::core::Type, ParseError> {
+    fn consume_prim_type_tok(&mut self) -> Result<ast::core::Type, ParseError> {
         if let Some(t) = self.peek().cloned() {
             if [Token::Int, Token::String, Token::Float].contains(&t) {
                 self.advance();
@@ -79,6 +79,7 @@ impl<'a> Parser<'a> {
         Err(ParseError::ExpectedTypeToken)
     }
 
+    // TODO: eliminate double-clone here, wtf
     fn consume_identifier(&mut self) -> Result<String, ParseError> {
         match self.token_stream.get(self.pos) {
             Some(Token::Identifier(x)) => {
@@ -152,10 +153,16 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // fn-decl -> T_FUNC • type • T_IDENTIFIER • T_PAREN_L • params • T_PAREN_R • block • T_DOT
+    // fn-decl -> T_FUNC • fn-type • T_IDENTIFIER • T_PAREN_L • params • T_PAREN_R • block • T_DOT
     fn parse_fn_decl(&mut self) -> Result<ast::core::FnDecl, ParseError> {
         self.consume(Token::Function)?;
-        let type_token = self.consume_type_token()?;
+        let type_token: Token;
+        if let Some(Token::Void) = self.peek() {
+            self.advance();
+            type_token = Token::Void
+        } else {
+            type_token = self.consume_prim_type_tok()?;
+        }
         let ident = self.consume_identifier()?;
         self.consume(Token::ParenL)?;
         let params = self.parse_params()?;
@@ -173,7 +180,7 @@ impl<'a> Parser<'a> {
 
     // var-decl -> type • T_IDENTIFIER • T_ASSIGN • expr-stmt
     fn parse_var_decl(&mut self) -> Result<ast::core::VarDecl, ParseError> {
-        let type_token = self.consume_type_token()?;
+        let type_token = self.consume_prim_type_tok()?;
         let ident = self.consume_identifier()?;
         self.consume(Token::AssignOp)?;
         let expr_stmt = self.parse_expr_stmt()?;
@@ -209,7 +216,7 @@ impl<'a> Parser<'a> {
 
     // param -> type • T_IDENTIFIER
     fn parse_param(&mut self) -> Result<ast::core::Param, ParseError> {
-        let type_token = self.consume_type_token()?;
+        let type_token = self.consume_prim_type_tok()?;
         let ident = self.consume_identifier()?;
 
         Ok(ast::core::Param {

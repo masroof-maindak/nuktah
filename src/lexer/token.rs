@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
-    // for, if, else, elif, ret
+    // duhrai, agar, warna, wapsi, dhancha, toro
     For,
     If,
     Else,
@@ -8,10 +8,11 @@ pub enum Token {
     Struct,
     Break,
 
-    // int, str, float, fn
+    // ginti, jumla, asharia, khali, fn
     Int,
     String,
     Float,
+    Void,
     Function,
 
     // (), {}, [], `, ", '
@@ -35,7 +36,7 @@ pub enum Token {
     // main, foo, bar, baz, etc
     Identifier(String),
 
-    // 33, `hello world!`, 5.1, TRUE, FALSE
+    // 33, `hello world!`, 5.1
     IntLit(i64),
     StringLit(String),
     FloatLit(f64),
