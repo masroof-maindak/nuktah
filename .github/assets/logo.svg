@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:svg xmlns:ns0="http://www.w3.org/2000/svg" width="800" height="200" text-anchor="middle">
+  <ns0:style>
+    text {
+      font-family: "Noto Nastaliq Urdu", "Noto Sans Arabic", sans-serif;
+      font-size: 120px;
+      fill: black;
+      dominant-baseline: middle;
+    }
+@media (prefers-color-scheme: dark) {
+  text { fill: white; }
+}
+@media (prefers-color-scheme: light) {
+  text { fill: black; }
+}
+</ns0:style>
+  <ns0:text x="50%" y="50%">۔</ns0:text>
+</ns0:svg>
