@@ -517,7 +517,7 @@ impl<'a> Parser<'a> {
                 }
 
                 let ident = self.consume_identifier()?;
-                Ok(ast::core::PrimaryExpr::Ident(Token::Identifier(ident)))
+                Ok(ast::core::PrimaryExpr::Ident(ident))
             }
 
             Token::IntLit(_) => {

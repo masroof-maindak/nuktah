@@ -34,7 +34,7 @@ fn analyse_fn_scope(_parent: &ScopeMap, fn_node: &FnDecl) -> Result<ScopeMap, Sc
 
     for param in fn_node.params.iter() {
         let sym_type = extract_sym_type(&param.t);
-        // Function parameters will override other global identifiers!
+        // NOTE: Function parameters will override other global identifiers.
         sym_table.insert_val(&param.ident, sym_type);
     }
 
@@ -58,7 +58,7 @@ fn analyse_block_scope(sym_table: &mut ScopeMap, block: &Block) -> Result<(), Sc
             }
 
             Stmt::Expr(es) | Stmt::Ret(es) => {
-                verify_expr_exists(&es.e)?;
+                check_expr_ident_exists(sym_table, &es.e)?;
             }
 
             Stmt::VarDecl(d) => {
@@ -72,15 +72,15 @@ fn analyse_block_scope(sym_table: &mut ScopeMap, block: &Block) -> Result<(), Sc
     Ok(())
 }
 
-fn analyse_for_scope(_parent: &ScopeMap, for_node: &ForStmt) -> Result<ScopeMap, ScopeError> {
+fn analyse_for_scope(parent: &ScopeMap, for_node: &ForStmt) -> Result<ScopeMap, ScopeError> {
     let mut sym_table = ScopeMap::new(); // TODO: use parent in constructor
 
     if for_node.init.is_some() {
         insert_var_to_scope(&mut sym_table, for_node.init.as_ref().unwrap())?;
     }
 
-    verify_expr_exists(&for_node.cond.e)?;
-    verify_expr_exists(&for_node.updt)?;
+    check_expr_ident_exists(parent, &for_node.cond.e)?;
+    check_expr_ident_exists(parent, &for_node.updt)?;
 
     analyse_block_scope(&mut sym_table, &for_node.block)?;
 
@@ -88,13 +88,13 @@ fn analyse_for_scope(_parent: &ScopeMap, for_node: &ForStmt) -> Result<ScopeMap,
 }
 
 fn analyse_if_scope(
-    _parent: &ScopeMap,
+    parent: &ScopeMap,
     if_node: &IfStmt,
 ) -> Result<(ScopeMap, ScopeMap), ScopeError> {
     let mut if_sym_table = ScopeMap::new(); // TODO: use parent in constructor
     let mut else_sym_table = ScopeMap::new(); // TODO: use parent in constructor
 
-    verify_expr_exists(&if_node.cond)?;
+    check_expr_ident_exists(parent, &if_node.cond)?;
 
     analyse_block_scope(&mut if_sym_table, &if_node.if_block)?;
     analyse_block_scope(&mut else_sym_table, &if_node.else_block)?;
@@ -102,13 +102,25 @@ fn analyse_if_scope(
     Ok((if_sym_table, else_sym_table))
 }
 
-fn verify_expr_exists(_expr: &Expr) -> Result<(), ScopeError> {
-    // TODO: If e == PrimaryExpr::Ident, verify that it gets resolved
+// if expr breaks down to PrimaryExpr::Ident, ensure that the identifier in question has been saved
+fn check_expr_ident_exists(sym_table: &ScopeMap, expr: &Expr) -> Result<(), ScopeError> {
+    if let Some(AssignExpr::Bool(BoolExpr::BitOr(BitOrExpr::BitAnd(BitAndExpr::Comp(
+        CompExpr::Shift(ShiftExpr::Add(AddExpr::Mul(MulExpr::Exp(ExpExpr::Unary(
+            UnaryExpr::Primary(PrimaryExpr::Ident(ident)),
+        ))))),
+    ))))) = expr
+    {
+        if !sym_exists(sym_table, ident) {
+            return Err(ScopeError::UndeclaredVariableUsed);
+        }
+    }
+
     Ok(())
 }
 
 fn sym_exists(_sym_table: &ScopeMap, _ident: &str) -> bool {
-    // TODO: iterate up parents till parent is None
+    // TODO: iterate up scope maps until parent becomes None and return true if ident is found at any point
+    // ScopeMap
     false
 }
 

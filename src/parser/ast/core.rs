@@ -175,7 +175,7 @@ pub enum PrimaryExpr {
     IntLit(Token),
     FloatLit(Token),
     StringLit(Token),
-    Ident(Token),
+    Ident(String),
     Paren(
         // ParenL
         Box<Expr>,
