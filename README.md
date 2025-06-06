@@ -46,7 +46,13 @@ cargo build -r
 		- [x] Analyse `PrimaryExpr::Ident`
 		- [x] Iterate up stack - parent 'climbing'? -> store Ids rather than references
 	- [ ] Type-checker
+		- [ ] Store whether symbol belongs to var/func in symbol table
+		- [ ] Variable declarations -> Literals' type == token type
+		- [ ] Function definitions -> return type == token type
+		- [ ] Recursive-descent expression chain(?)
+	- [ ] Refactor into separate sub-modules
 - [ ] Init IR generation
+- [ ] Unit tests
 - [ ] Arrays
 - [ ] Structs
 - [ ] Rewrite expression printing rules (for the AST) w/ macros
