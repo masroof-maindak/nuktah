@@ -1,10 +1,10 @@
-use super::{
-    errors::ScopeError,
-    scope_utils::{check_for_undeclared_ident, sym_exists},
-    spaghetti::{Id, SpaghettiStack, SymType},
-};
+use super::recurse::{check_for_undeclared_ident, sym_exists};
 use crate::lexer::Token;
 use crate::parser::ast::core::*;
+use crate::semantics::{
+    errors::ScopeError,
+    spaghetti::{Id, SpaghettiStack, SymType},
+};
 
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
 pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, ScopeError> {
