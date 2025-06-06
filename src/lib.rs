@@ -36,8 +36,8 @@ pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     let ast_root = parser::core::parse_token_stream(&tokens)?;
     println!("AST:\n{:#?}\n", ast_root);
 
-    // let sym_table = semantics::core::analyse_semantics(&ast_root)?;
-    // println!("AST:\n{:#?}\n", sym_table);
+    let sym_table = semantics::core::analyse_semantics(&ast_root)?;
+    println!("AST:\n{:#?}\n", sym_table);
 
     Ok(())
 }

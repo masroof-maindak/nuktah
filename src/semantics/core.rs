@@ -1,5 +1,5 @@
 use super::{scope, typchk};
-use crate::{parser::ast, semantics::spaghetti::ScopeMap};
+use crate::{parser::ast, semantics::spaghetti::SpaghettiStack};
 
 #[derive(Debug)]
 pub enum SemanticError {
@@ -21,8 +21,10 @@ impl From<typchk::TypeChkError> for SemanticError {
     }
 }
 
-pub fn analyse_semantics(ast_root: &ast::core::TranslationUnit) -> Result<ScopeMap, SemanticError> {
-    let sym_table = scope::analyse_scope(ast_root)?;
-    typchk::check_types(ast_root, &sym_table)?;
-    Ok(sym_table)
+pub fn analyse_semantics(
+    ast_root: &ast::core::TranslationUnit,
+) -> Result<SpaghettiStack, SemanticError> {
+    let symbol_table = scope::analyse_scope(ast_root)?;
+    typchk::check_types(ast_root, &symbol_table)?;
+    Ok(symbol_table)
 }

@@ -38,14 +38,13 @@ cargo build -r
 - [x] Allow empty expressions so `duhrao (..)` is valid
 - [x] Void type - `khali`
 - [ ] Semantic analyser
-	- [ ] Scope
+	- [x] Scope
 		- [x] SpaghettiStack skeleton
 		- [x] Analyse declarations
 		- [x] Analyse blocks
         - [x] Analyse for/if
-		- [x] Analyse primary::ident
-		- [ ] Iterate up stack - parent 'climbing'?
-		- [ ] Implement debug trait (for printing)
+		- [x] Analyse `PrimaryExpr::Ident`
+		- [x] Iterate up stack - parent 'climbing'? -> store Ids rather than references
 	- [ ] Type-checker
 - [ ] Init IR generation
 - [ ] Arrays

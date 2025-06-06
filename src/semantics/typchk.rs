@@ -1,4 +1,4 @@
-use crate::{parser::ast, semantics::spaghetti::ScopeMap};
+use crate::{parser::ast, semantics::spaghetti::SpaghettiStack};
 
 #[derive(Debug)]
 pub enum TypeChkError {
@@ -10,7 +10,7 @@ pub enum TypeChkError {
 
 pub fn check_types(
     _ast_root: &ast::core::TranslationUnit,
-    _sym_table: &ScopeMap,
+    _symbol_table: &SpaghettiStack,
 ) -> Result<(), TypeChkError> {
     Ok(())
 }
