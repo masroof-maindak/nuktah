@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
-    // duhrai, agar, warna, wapsi, dhancha, toro
+    // duhrao, agar, warna, wapsi, dhancha, toro
     For,
     If,
     Else,
