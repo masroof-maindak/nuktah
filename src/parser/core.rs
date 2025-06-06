@@ -123,9 +123,6 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // CHECK: currently getting a deeply-nested list with the `primary-expr` at the very end
-    // Can we get rid of this? Do we even need to?
-
     // translation-unit -> decl-list
     fn parse_translation_unit(&mut self) -> Result<ast::core::TranslationUnit, ParseError> {
         self.parse_decl_list()
@@ -329,6 +326,7 @@ impl<'a> Parser<'a> {
 
     // expr -> assign-expr
     // Note that this function will always return some.
+    // Empty expressions, where used, are detected via lookaheads.
     fn parse_expr(&mut self) -> Result<ast::core::Expr, ParseError> {
         let expr = self.parse_assign_expr()?;
         Ok(Some(expr))
@@ -489,11 +487,9 @@ impl<'a> Parser<'a> {
         Ok(ret)
     }
 
-    // unary-expr -> primary | unary-op • unary-expr
+    // FIXME: unary-expr -> primary | unary-op • unary-expr
     // unary-op -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
     fn parse_unary_expr(&mut self) -> Result<ast::core::UnaryExpr, ParseError> {
-        // FIXME
-
         match self.peek().cloned() {
             Some(t @ (Token::SubOp | Token::BooleanNot | Token::BitwiseNot)) => {
                 self.advance();
@@ -521,18 +517,18 @@ impl<'a> Parser<'a> {
             }
 
             Token::IntLit(_) => {
-                let intlit = self.consume_intlit()?;
-                Ok(ast::core::PrimaryExpr::IntLit(Token::IntLit(intlit)))
+                let i_lit = self.consume_intlit()?;
+                Ok(ast::core::PrimaryExpr::IntLit(i_lit))
             }
 
             Token::FloatLit(_) => {
-                let floatlit = self.consume_floatlit()?;
-                Ok(ast::core::PrimaryExpr::FloatLit(Token::FloatLit(floatlit)))
+                let f_lit = self.consume_floatlit()?;
+                Ok(ast::core::PrimaryExpr::FloatLit(f_lit))
             }
 
             Token::StringLit(_) => {
                 let str = self.consume_stringlit()?;
-                Ok(ast::core::PrimaryExpr::StringLit(Token::StringLit(str)))
+                Ok(ast::core::PrimaryExpr::StringLit(str))
             }
 
             Token::ParenL => {

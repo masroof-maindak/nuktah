@@ -172,9 +172,9 @@ pub enum UnaryExpr {
 }
 
 pub enum PrimaryExpr {
-    IntLit(Token),
-    FloatLit(Token),
-    StringLit(Token),
+    IntLit(i64),
+    FloatLit(f64),
+    StringLit(String),
     Ident(String),
     Paren(
         // ParenL
