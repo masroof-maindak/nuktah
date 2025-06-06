@@ -1,4 +1,4 @@
-use crate::lexer::token::Token;
+use super::Token;
 
 const DELIM: &str = " \r\n\t\"\'\\&|;=(){}[]<>+-*/%^`!`.:~,$";
 

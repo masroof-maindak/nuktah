@@ -37,10 +37,16 @@ cargo build -r
 - [x] Break keyword - `toro`
 - [x] Allow empty expressions so `duhrao (..)` is valid
 - [x] Void type - `khali`
-- [ ] Init semantic analyser
+- [ ] Semantic analyser
 	- [ ] Scope
+		- [x] SpaghettiStack skeleton
+		- [x] Analyse declarations
+		- [x] Analyse blocks
+        - [x] Analyse for/if
+		- [x] Analyse primary::ident
+		- [ ] Iterate up stack - parent 'climbing'?
+		- [ ] Implement debug trait (for printing)
 	- [ ] Type-checker
-	- [ ] ???
 - [ ] Init IR generation
 - [ ] Arrays
 - [ ] Structs

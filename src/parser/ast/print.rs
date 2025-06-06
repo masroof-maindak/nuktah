@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::lexer::token::Token;
+use crate::lexer::Token;
 use crate::parser::ast::core::*;
 
 // TODO: Use Macros or some shit and burn this entire file

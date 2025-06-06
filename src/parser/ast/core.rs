@@ -1,4 +1,4 @@
-use crate::lexer::token::Token;
+use crate::lexer::Token;
 
 pub type TranslationUnit = DeclList;
 
@@ -13,7 +13,7 @@ pub enum Decl {
 #[derive(Debug)]
 pub struct VarDecl {
     pub t: Type,
-    pub i: Token, // Identifier,
+    pub ident: String, // Identifier,
     // AssignOp,
     pub e: Expr,
 }
@@ -22,11 +22,11 @@ pub struct VarDecl {
 pub struct FnDecl {
     // Fn
     pub t: Type,
-    pub i: Token, // Identifier,
+    pub ident: String, // Identifier,
     // ParenL,
-    pub p: Vec<Param>,
+    pub params: Vec<Param>,
     // ParenR,
-    pub b: Block,
+    pub block: Block,
     // Dot
 }
 
@@ -35,7 +35,7 @@ pub type Type = Token; // {Int,String,Float}Lit
 #[derive(Debug)]
 pub struct Param {
     pub t: Type,
-    pub i: Token, // Identifier
+    pub ident: String, // Identifier
 }
 
 pub type Block = Vec<Stmt>;
@@ -58,23 +58,21 @@ pub struct ForStmt {
     pub cond: ExprStmt,
     pub updt: Expr,
     // ParenR
-    pub b: Block,
+    pub block: Block,
 }
 
 #[derive(Debug)]
 pub struct IfStmt {
     // If
     // ParenL
-    pub e: Expr,
+    pub cond: Expr,
     // ParenR
-    pub ib: Block,
+    pub if_block: Block,
     // Else
-    pub eb: Block,
+    pub else_block: Block,
 }
 
 pub type RetStmt = ExprStmt;
-
-// expr stmt -> expr t_dot (thus unnecessary in *abstract* syntax tree)
 
 #[derive(Debug)]
 pub struct ExprStmt {
@@ -188,7 +186,7 @@ pub enum PrimaryExpr {
 
 #[derive(Debug)]
 pub struct FnCall {
-    pub i: Token, // Identifier
+    pub ident: String, // Identifier
     // ParenL
     pub args: FnArgs,
     // ParenR

@@ -1,4 +1,4 @@
-use crate::lexer::token::Token;
+use crate::lexer::Token;
 use crate::parser::ast;
 
 #[derive(Debug)]
@@ -79,13 +79,12 @@ impl<'a> Parser<'a> {
         Err(ParseError::ExpectedTypeToken)
     }
 
-    // TODO: eliminate double-clone here, wtf
     fn consume_identifier(&mut self) -> Result<String, ParseError> {
         match self.token_stream.get(self.pos) {
             Some(Token::Identifier(x)) => {
                 let name = x.clone();
                 self.advance();
-                Ok(name.clone())
+                Ok(name)
             }
             _ => Err(ParseError::ExpectedIdentifier),
         }
@@ -172,9 +171,9 @@ impl<'a> Parser<'a> {
 
         Ok(ast::core::FnDecl {
             t: type_token,
-            i: Token::Identifier(ident),
-            p: params,
-            b: block,
+            ident,
+            params,
+            block,
         })
     }
 
@@ -191,7 +190,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::core::VarDecl {
             t: type_token,
-            i: Token::Identifier(ident),
+            ident,
             e: expr_stmt.e,
         })
     }
@@ -221,7 +220,7 @@ impl<'a> Parser<'a> {
 
         Ok(ast::core::Param {
             t: type_token,
-            i: Token::Identifier(ident),
+            ident,
         })
     }
 
@@ -288,7 +287,7 @@ impl<'a> Parser<'a> {
             init,
             cond,
             updt,
-            b: self.parse_block()?,
+            block: self.parse_block()?,
         })
     }
 
@@ -303,9 +302,9 @@ impl<'a> Parser<'a> {
         let else_block = self.parse_block()?;
 
         Ok(ast::core::IfStmt {
-            e: cond,
-            ib: if_block,
-            eb: else_block,
+            cond,
+            if_block,
+            else_block,
         })
     }
 
@@ -555,10 +554,7 @@ impl<'a> Parser<'a> {
         let args = self.parse_fn_args()?;
         self.consume(Token::ParenR)?;
 
-        Ok(ast::core::FnCall {
-            i: Token::Identifier(ident),
-            args,
-        })
+        Ok(ast::core::FnCall { ident, args })
     }
 
     // fn-args -> expr | expr • T_COMMA • fn-args | EPSILON

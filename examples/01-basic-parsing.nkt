@@ -1,5 +1,4 @@
 fn ginti a(ginti x, ginti y) {} .
-
-ginti b = a(3, 6).
-
-ginti h = 6 * f + 3 * 2 - g * b * x * z.
+ginti b = a(3, 6) .
+ginti h = 6 * f + 3 * 2 - g * b * x * z .
+ginti c = b .
