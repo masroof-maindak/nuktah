@@ -1,0 +1,4 @@
+fn ginti some_fn() {
+	duhrao (ginti a = 3 . a < 10 . a = a + 1) {}
+	$ Should throw scope error.
+} .

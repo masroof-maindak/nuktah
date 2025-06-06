@@ -15,7 +15,7 @@ pub struct VarDecl {
     pub t: Type,
     pub ident: String, // Identifier,
     // AssignOp,
-    pub e: Expr,
+    pub expr: Expr,
 }
 
 #[derive(Debug)]
@@ -81,7 +81,7 @@ pub struct ExprStmt {
 }
 
 pub type Expr = Option<AssignExpr>;
-
+#[derive(Clone)]
 pub enum AssignExpr {
     Bool(BoolExpr),
     Assign(
@@ -90,7 +90,7 @@ pub enum AssignExpr {
         Box<AssignExpr>,
     ),
 }
-
+#[derive(Clone)]
 pub enum BoolExpr {
     BitOr(BitOrExpr),
     Bool(
@@ -99,7 +99,7 @@ pub enum BoolExpr {
         BitOrExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum BitOrExpr {
     BitAnd(BitAndExpr),
     BitOr(
@@ -108,7 +108,7 @@ pub enum BitOrExpr {
         BitAndExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum BitAndExpr {
     Comp(CompExpr),
     BitAnd(
@@ -117,7 +117,7 @@ pub enum BitAndExpr {
         CompExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum CompExpr {
     Shift(ShiftExpr),
     Comp(
@@ -126,7 +126,7 @@ pub enum CompExpr {
         ShiftExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum ShiftExpr {
     Add(AddExpr),
     Shift(
@@ -135,7 +135,7 @@ pub enum ShiftExpr {
         AddExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum AddExpr {
     Mul(MulExpr),
     Add(
@@ -144,7 +144,7 @@ pub enum AddExpr {
         MulExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum MulExpr {
     Exp(ExpExpr),
     Mul(
@@ -153,7 +153,7 @@ pub enum MulExpr {
         ExpExpr,
     ),
 }
-
+#[derive(Clone)]
 pub enum ExpExpr {
     Unary(UnaryExpr),
     Exp(
@@ -162,7 +162,7 @@ pub enum ExpExpr {
         Box<ExpExpr>,
     ),
 }
-
+#[derive(Clone)]
 pub enum UnaryExpr {
     Primary(PrimaryExpr),
     Unary(
@@ -170,7 +170,7 @@ pub enum UnaryExpr {
         Box<UnaryExpr>,
     ),
 }
-
+#[derive(Clone)]
 pub enum PrimaryExpr {
     IntLit(i64),
     FloatLit(f64),
@@ -183,8 +183,7 @@ pub enum PrimaryExpr {
     ),
     Call(FnCall),
 }
-
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct FnCall {
     pub ident: String, // Identifier
     // ParenL

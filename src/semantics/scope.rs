@@ -1,13 +1,10 @@
+use super::{
+    errors::ScopeError,
+    scope_utils::{check_for_undeclared_ident, sym_exists},
+    spaghetti::{Id, SpaghettiStack, SymType},
+};
 use crate::lexer::Token;
 use crate::parser::ast::core::*;
-use crate::semantics::spaghetti::{Id, SpaghettiStack, SymType};
-
-#[derive(Debug)]
-pub enum ScopeError {
-    UndeclaredVariableUsed,
-    VariableRedefinition,
-    FunctionPrototypeRedefinition,
-}
 
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
 pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, ScopeError> {
@@ -17,10 +14,11 @@ pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, Scope
     for decl in ast_root {
         match decl {
             Decl::Var(d) => {
-                insert_var_in_scope(&mut spaghet, root_id, d)?;
+                insert_var_to_scope(&mut spaghet, root_id, d)?;
             }
 
             Decl::Fn(f) => {
+                insert_fn_to_scope(&mut spaghet, root_id, f)?;
                 let fn_table_id = generate_function_scope(&mut spaghet, root_id, f)?;
                 spaghet.add_node_as_child_of(root_id, fn_table_id);
             }
@@ -41,7 +39,7 @@ fn generate_function_scope(
 
     for param in fn_node.params.iter() {
         let sym_type = extract_sym_type(&param.t);
-        spaghet.insert_var_in_node(fn_table_id, &param.ident, sym_type);
+        spaghet.insert_identifier_in_node(fn_table_id, &param.ident, sym_type);
     }
 
     analyse_block_scope(spaghet, fn_table_id, &fn_node.block)?;
@@ -68,11 +66,11 @@ fn analyse_block_scope(
             }
 
             Stmt::Expr(es) | Stmt::Ret(es) => {
-                check_expr_ident_exists(spaghet, curr_id, &es.e)?;
+                check_for_undeclared_ident(spaghet, curr_id, &es.e)?;
             }
 
             Stmt::VarDecl(d) => {
-                insert_var_in_scope(spaghet, curr_id, d)?;
+                insert_var_to_scope(spaghet, curr_id, d)?;
             }
 
             Stmt::Break => {} // ignore
@@ -90,11 +88,12 @@ fn generate_for_scope(
     let for_table_id = spaghet.create_scope_map(Some(parent_id));
 
     if for_node.init.is_some() {
-        insert_var_in_scope(spaghet, for_table_id, for_node.init.as_ref().unwrap())?;
+        insert_var_to_scope(spaghet, for_table_id, for_node.init.as_ref().unwrap())?;
     }
 
-    check_expr_ident_exists(spaghet, parent_id, &for_node.cond.e)?;
-    check_expr_ident_exists(spaghet, parent_id, &for_node.updt)?;
+    // New variables could have been allocated in this for's scope
+    check_for_undeclared_ident(spaghet, for_table_id, &for_node.cond.e)?;
+    check_for_undeclared_ident(spaghet, for_table_id, &for_node.updt)?;
 
     analyse_block_scope(spaghet, for_table_id, &for_node.block)?;
 
@@ -109,7 +108,8 @@ fn generate_if_scope(
     let if_table_id = spaghet.create_scope_map(Some(parent_id));
     let else_table_id = spaghet.create_scope_map(Some(parent_id));
 
-    check_expr_ident_exists(spaghet, parent_id, &if_node.cond)?;
+    // New variables can not be declared in this if's scope
+    check_for_undeclared_ident(spaghet, parent_id, &if_node.cond)?;
 
     analyse_block_scope(spaghet, if_table_id, &if_node.if_block)?;
     analyse_block_scope(spaghet, else_table_id, &if_node.else_block)?;
@@ -117,41 +117,7 @@ fn generate_if_scope(
     Ok((if_table_id, else_table_id))
 }
 
-// if expr breaks down to PrimaryExpr::Ident, ensure that the identifier in question has been saved
-fn check_expr_ident_exists(
-    spaghet: &SpaghettiStack,
-    curr_id: Id,
-    expr: &Expr,
-) -> Result<(), ScopeError> {
-    if let Some(AssignExpr::Bool(BoolExpr::BitOr(BitOrExpr::BitAnd(BitAndExpr::Comp(
-        CompExpr::Shift(ShiftExpr::Add(AddExpr::Mul(MulExpr::Exp(ExpExpr::Unary(
-            UnaryExpr::Primary(PrimaryExpr::Ident(ident)),
-        ))))),
-    ))))) = expr
-    {
-        if !sym_exists(spaghet, curr_id, ident) {
-            return Err(ScopeError::UndeclaredVariableUsed);
-        }
-    }
-
-    Ok(())
-}
-
-fn sym_exists(spaghet: &SpaghettiStack, curr_id: Id, ident: &str) -> bool {
-    let mut node_id: Option<Id> = Some(curr_id);
-
-    while node_id.is_some() {
-        if spaghet.check_if_var_exists(node_id.unwrap(), ident) {
-            return true;
-        } else {
-            node_id = spaghet.get_node_parent_id(node_id.unwrap());
-        }
-    }
-
-    false
-}
-
-fn insert_var_in_scope(
+fn insert_var_to_scope(
     spaghet: &mut SpaghettiStack,
     scope_map_id: Id,
     d: &VarDecl,
@@ -160,8 +126,24 @@ fn insert_var_in_scope(
         return Err(ScopeError::VariableRedefinition);
     }
 
+    check_for_undeclared_ident(spaghet, scope_map_id, &d.expr)?;
+
     let sym_type = extract_sym_type(&d.t);
-    spaghet.insert_var_in_node(scope_map_id, &d.ident, sym_type);
+    spaghet.insert_identifier_in_node(scope_map_id, &d.ident, sym_type);
+    Ok(())
+}
+
+fn insert_fn_to_scope(
+    spaghet: &mut SpaghettiStack,
+    scope_map_id: Id,
+    f: &FnDecl,
+) -> Result<(), ScopeError> {
+    if sym_exists(spaghet, scope_map_id, &f.ident) {
+        return Err(ScopeError::VariableRedefinition);
+    }
+
+    let sym_type = extract_sym_type(&f.t);
+    spaghet.insert_identifier_in_node(scope_map_id, &f.ident, sym_type);
     Ok(())
 }
 

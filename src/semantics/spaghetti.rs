@@ -13,6 +13,8 @@ pub enum SymType {
     String,
 }
 
+// CHECK: should I store a bool `is_var` to remember whether an identifier is a variable or a function?
+
 pub type Id = usize;
 
 #[derive(Debug)]
@@ -63,7 +65,7 @@ impl SpaghettiStack {
         id
     }
 
-    pub fn insert_var_in_node(&mut self, node_id: Id, ident: &str, sym_type: SymType) {
+    pub fn insert_identifier_in_node(&mut self, node_id: Id, ident: &str, sym_type: SymType) {
         self.descendants
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
@@ -84,16 +86,12 @@ impl SpaghettiStack {
             .parent
     }
 
-    pub fn check_if_var_exists(&self, node_id: Id, ident: &str) -> bool {
-        match self
-            .descendants
+    pub fn does_identifier_exist(&self, node_id: Id, ident: &str) -> bool {
+        self.descendants
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .value
             .get(ident)
-        {
-            Some(_) => true,
-            None => false,
-        }
+            .is_some()
     }
 }

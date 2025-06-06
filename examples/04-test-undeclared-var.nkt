@@ -1,0 +1,4 @@
+fn ginti some_fn() {
+	ginti x = fake_var1 + 10 .
+	$ Should throw scope error.
+} .

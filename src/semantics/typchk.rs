@@ -1,12 +1,7 @@
-use crate::{parser::ast, semantics::spaghetti::SpaghettiStack};
-
-#[derive(Debug)]
-pub enum TypeChkError {
-    FunctionCallAndPrototypeMismatch,
-    VariableLiteralValueAssignment,
-    VariableExpressionAssignment,
-    ExpectedBooleanExpression,
-}
+use crate::{
+    parser::ast,
+    semantics::{errors::TypeChkError, spaghetti::SpaghettiStack},
+};
 
 pub fn check_types(
     _ast_root: &ast::core::TranslationUnit,

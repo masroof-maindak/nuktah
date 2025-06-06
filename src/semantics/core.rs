@@ -1,22 +1,22 @@
-use super::{scope, typchk};
-use crate::{parser::ast, semantics::spaghetti::SpaghettiStack};
+use super::{errors, scope, spaghetti::SpaghettiStack, typchk};
+use crate::parser::ast;
 
 #[derive(Debug)]
 pub enum SemanticError {
-    ScopeError(scope::ScopeError),
-    TypeChkError(typchk::TypeChkError),
+    ScopeError(errors::ScopeError),
+    TypeChkError(errors::TypeChkError),
 }
 
 // TODO: Can we do this w/ a macro?
 
-impl From<scope::ScopeError> for SemanticError {
-    fn from(err: scope::ScopeError) -> SemanticError {
+impl From<errors::ScopeError> for SemanticError {
+    fn from(err: errors::ScopeError) -> SemanticError {
         SemanticError::ScopeError(err)
     }
 }
 
-impl From<typchk::TypeChkError> for SemanticError {
-    fn from(err: typchk::TypeChkError) -> SemanticError {
+impl From<errors::TypeChkError> for SemanticError {
+    fn from(err: errors::TypeChkError) -> SemanticError {
         SemanticError::TypeChkError(err)
     }
 }

@@ -188,7 +188,7 @@ impl<'a> Parser<'a> {
         Ok(ast::core::VarDecl {
             t: type_token,
             ident,
-            e: expr_stmt.e,
+            expr: expr_stmt.e,
         })
     }
 

@@ -31,13 +31,13 @@ impl From<semantics::core::SemanticError> for CompilerError {
 
 pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     let tokens = lexer::core::tokenize_src_code(src_code)?;
-    println!("Tokens:\n{:?}\n", tokens);
+    // println!("Tokens:\n{:?}\n", tokens);
 
     let ast_root = parser::core::parse_token_stream(&tokens)?;
-    println!("AST:\n{:#?}\n", ast_root);
+    // println!("AST:\n{:#?}\n", ast_root);
 
     let sym_table = semantics::core::analyse_semantics(&ast_root)?;
-    println!("AST:\n{:#?}\n", sym_table);
+    println!("Symbol Table:\n{:#?}\n", sym_table);
 
     Ok(())
 }

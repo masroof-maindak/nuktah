@@ -1,0 +1,4 @@
+fn ginti some_fn() {
+	ginti x = fake_fn() .
+	wapsi x .
+} .
