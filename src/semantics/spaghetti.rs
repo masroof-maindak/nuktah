@@ -27,21 +27,31 @@ impl SymInfo {
     }
 }
 
+#[derive(Debug)]
+pub enum ScopeType {
+    Root,
+    FnBlock,
+    ForBlock,
+    IfBlock,
+}
+
 pub type Id = usize;
 
 #[derive(Debug)]
 struct ScopeMap {
-    value: HashMap<String, SymInfo>,
+    scope_type: ScopeType,
     parent: Option<Id>,
     children: Vec<Id>,
+    value: HashMap<String, SymInfo>,
 }
 
 impl ScopeMap {
-    fn new(parent_id: Option<Id>) -> ScopeMap {
+    fn new(parent_id: Option<Id>, scope_type: ScopeType) -> ScopeMap {
         ScopeMap {
-            value: HashMap::new(),
+            scope_type,
             parent: parent_id,
             children: vec![],
+            value: HashMap::new(),
         }
     }
 
@@ -71,9 +81,10 @@ impl SpaghettiStack {
         }
     }
 
-    pub fn create_scope_map(&mut self, parent_id: Option<Id>) -> Id {
+    pub fn create_scope_map(&mut self, parent_id: Option<Id>, scope_type: ScopeType) -> Id {
         let id = self.descendants.len();
-        self.descendants.insert(id, ScopeMap::new(parent_id));
+        self.descendants
+            .insert(id, ScopeMap::new(parent_id, scope_type));
         id
     }
 

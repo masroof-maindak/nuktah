@@ -48,7 +48,8 @@ cargo build -r
 - [x] CI/CD -> Build/Release
 - [x] Use macros for error conversions
 - [ ] Type-checker
-    - [ ] Store whether symbol belongs to var/func in symbol table
+    - [x] Store whether symbol belongs to var/func in symbol table
+    - [x] Store type of scope in ScopeMap
     - [ ] Variable declarations -> Literals' type == token type
     - [ ] Function definitions -> return type == token type
     - [ ] Recursive-descent expression chain(?)

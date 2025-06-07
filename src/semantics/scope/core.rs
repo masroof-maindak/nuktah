@@ -4,13 +4,13 @@ use crate::parser::ast::core::*;
 use crate::semantics::spaghetti::SymInfo;
 use crate::semantics::{
     errors::ScopeError,
-    spaghetti::{Id, SpaghettiStack, SymType},
+    spaghetti::{Id, ScopeType, SpaghettiStack, SymType},
 };
 
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
 pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, ScopeError> {
     let mut spaghet: SpaghettiStack = Default::default();
-    let root_id = spaghet.create_scope_map(None);
+    let root_id = spaghet.create_scope_map(None, ScopeType::Root);
 
     for decl in ast_root {
         match decl {
@@ -36,7 +36,7 @@ fn generate_function_scope(
     parent_id: Id,
     fn_node: &FnDecl,
 ) -> Result<Id, ScopeError> {
-    let fn_table_id = spaghet.create_scope_map(Some(parent_id));
+    let fn_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::FnBlock);
 
     for param in fn_node.params.iter() {
         let sym_type = extract_sym_type(&param.t);
@@ -86,7 +86,7 @@ fn generate_for_scope(
     parent_id: Id,
     for_node: &ForStmt,
 ) -> Result<Id, ScopeError> {
-    let for_table_id = spaghet.create_scope_map(Some(parent_id));
+    let for_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::ForBlock);
 
     if for_node.init.is_some() {
         insert_var_to_scope(spaghet, for_table_id, for_node.init.as_ref().unwrap())?;
@@ -106,8 +106,8 @@ fn generate_if_scope(
     parent_id: Id,
     if_node: &IfStmt,
 ) -> Result<(Id, Id), ScopeError> {
-    let if_table_id = spaghet.create_scope_map(Some(parent_id));
-    let else_table_id = spaghet.create_scope_map(Some(parent_id));
+    let if_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock);
+    let else_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock);
 
     // New variables can not be declared in this if's condition
     check_for_undeclared_ident(spaghet, parent_id, &if_node.cond)?;
