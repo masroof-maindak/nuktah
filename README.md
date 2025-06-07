@@ -51,6 +51,7 @@ cargo build -r
 		- [ ] Variable declarations -> Literals' type == token type
 		- [ ] Function definitions -> return type == token type
 		- [ ] Recursive-descent expression chain(?)
+- [x] CI/CD -> Build/Release
 - [ ] Init IR generation
 - [ ] Unit tests
 - [ ] Arrays
