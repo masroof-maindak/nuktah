@@ -1,33 +1,18 @@
 pub mod lexer;
+pub mod macros;
 pub mod parser;
 pub mod semantics;
 
-// TODO: perform error conversion w/ a macro
-
 #[derive(Debug)]
 pub enum CompilerError {
-    LexerError(lexer::core::LexerError),
-    ParserError(parser::core::ParseError),
-    SemanticError(semantics::core::SemanticError),
+    Lexer(lexer::core::LexerError),
+    Parser(parser::core::ParseError),
+    Semantics(semantics::core::SemanticError),
 }
 
-impl From<lexer::core::LexerError> for CompilerError {
-    fn from(err: lexer::core::LexerError) -> CompilerError {
-        CompilerError::LexerError(err)
-    }
-}
-
-impl From<parser::core::ParseError> for CompilerError {
-    fn from(err: parser::core::ParseError) -> CompilerError {
-        CompilerError::ParserError(err)
-    }
-}
-
-impl From<semantics::core::SemanticError> for CompilerError {
-    fn from(err: semantics::core::SemanticError) -> CompilerError {
-        CompilerError::SemanticError(err)
-    }
-}
+convert_across_err!(lexer::core::LexerError, CompilerError, Lexer);
+convert_across_err!(parser::core::ParseError, CompilerError, Parser);
+convert_across_err!(semantics::core::SemanticError, CompilerError, Semantics);
 
 pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     let tokens = lexer::core::tokenize_src_code(src_code)?;

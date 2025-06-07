@@ -37,22 +37,23 @@ cargo build -r
 - [x] Break keyword - `toro`
 - [x] Allow empty expressions so `duhrao (..)` is valid
 - [x] Void type - `khali`
-- [ ] Semantic analyser
-	- [x] Scope
-		- [x] SpaghettiStack skeleton
-		- [x] Analyse declarations
-		- [x] Analyse blocks
-        - [x] Analyse for/if
-		- [x] Analyse `PrimaryExpr::Ident`
-		- [x] Iterate up stack - parent 'climbing'? -> store Ids rather than references
-	- [x] Refactor into separate sub-modules
-	- [ ] Type-checker
-		- [ ] Store whether symbol belongs to var/func in symbol table
-		- [ ] Variable declarations -> Literals' type == token type
-		- [ ] Function definitions -> return type == token type
-		- [ ] Recursive-descent expression chain(?)
+- [x] Scope Analyser
+    - [x] SpaghettiStack skeleton
+    - [x] Analyse declarations
+    - [x] Analyse blocks
+    - [x] Analyse for/if
+    - [x] Analyse `PrimaryExpr::Ident`
+    - [x] Iterate up stack - parent 'climbing'? -> store Ids rather than references
+- [x] Refactor into separate sub-modules
 - [x] CI/CD -> Build/Release
+- [x] Use macros for error conversions
+- [ ] Type-checker
+    - [ ] Store whether symbol belongs to var/func in symbol table
+    - [ ] Variable declarations -> Literals' type == token type
+    - [ ] Function definitions -> return type == token type
+    - [ ] Recursive-descent expression chain(?)
 - [ ] Init IR generation
+- [ ] Eliminate `mod.rs` files
 - [ ] Unit tests
 - [ ] Arrays
 - [ ] Structs

@@ -4,27 +4,17 @@ use super::{
     spaghetti::SpaghettiStack,
     typchk,
 };
+use crate::convert_across_err;
 use crate::parser::ast;
-
-// TODO: perform error conversion w/ a macro
 
 #[derive(Debug)]
 pub enum SemanticError {
-    ScopeError(ScopeError),
-    TypeChkError(TypeChkError),
+    Scope(ScopeError),
+    TypeChk(TypeChkError),
 }
 
-impl From<ScopeError> for SemanticError {
-    fn from(err: ScopeError) -> SemanticError {
-        SemanticError::ScopeError(err)
-    }
-}
-
-impl From<TypeChkError> for SemanticError {
-    fn from(err: TypeChkError) -> SemanticError {
-        SemanticError::TypeChkError(err)
-    }
-}
+convert_across_err!(ScopeError, SemanticError, Scope);
+convert_across_err!(TypeChkError, SemanticError, TypeChk);
 
 pub fn analyse_semantics(
     ast_root: &ast::core::TranslationUnit,
