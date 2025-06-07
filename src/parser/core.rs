@@ -487,6 +487,7 @@ impl<'a> Parser<'a> {
         Ok(ret)
     }
 
+    // unary-expr -> primary | unary-op • unary-expr
     // unary-op -> T_SUBOP | T_BOOLEANOT | T_BITWISENOT
     fn parse_unary_expr(&mut self) -> Result<ast::core::UnaryExpr, ParseError> {
         match self.peek().cloned() {
