@@ -2,14 +2,14 @@ pub mod lexer;
 pub mod parser;
 pub mod semantics;
 
+// TODO: perform error conversion w/ a macro
+
 #[derive(Debug)]
 pub enum CompilerError {
     LexerError(lexer::core::LexerError),
     ParserError(parser::core::ParseError),
     SemanticError(semantics::core::SemanticError),
 }
-
-// TODO: more elegant way to do this?
 
 impl From<lexer::core::LexerError> for CompilerError {
     fn from(err: lexer::core::LexerError) -> CompilerError {

@@ -6,13 +6,13 @@ use super::{
 };
 use crate::parser::ast;
 
+// TODO: perform error conversion w/ a macro
+
 #[derive(Debug)]
 pub enum SemanticError {
     ScopeError(ScopeError),
     TypeChkError(TypeChkError),
 }
-
-// TODO: Can we do this w/ a macro?
 
 impl From<ScopeError> for SemanticError {
     fn from(err: ScopeError) -> SemanticError {
