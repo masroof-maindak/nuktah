@@ -167,7 +167,7 @@ impl<'a> Parser<'a> {
         self.consume(Token::Dot)?;
 
         Ok(ast::core::FnDecl {
-            t: type_token,
+            type_tok: type_token,
             ident,
             params,
             block,
@@ -181,14 +181,14 @@ impl<'a> Parser<'a> {
         self.consume(Token::AssignOp)?;
         let expr_stmt = self.parse_expr_stmt()?;
 
-        if expr_stmt.e.is_none() {
+        if expr_stmt.expr.is_none() {
             return Err(ParseError::ExpectedExpr);
         }
 
         Ok(ast::core::VarDecl {
-            t: type_token,
+            type_tok: type_token,
             ident,
-            expr: expr_stmt.e,
+            expr: expr_stmt.expr,
         })
     }
 
@@ -216,7 +216,7 @@ impl<'a> Parser<'a> {
         let ident = self.consume_identifier()?;
 
         Ok(ast::core::Param {
-            t: type_token,
+            type_tok: type_token,
             ident,
         })
     }
@@ -315,13 +315,13 @@ impl<'a> Parser<'a> {
     fn parse_expr_stmt(&mut self) -> Result<ast::core::ExprStmt, ParseError> {
         if let Some(Token::Dot) = self.peek() {
             self.advance();
-            return Ok(ast::core::ExprStmt { e: None });
+            return Ok(ast::core::ExprStmt { expr: None });
         }
 
         let expr = self.parse_expr()?;
         self.consume(Token::Dot)?;
 
-        Ok(ast::core::ExprStmt { e: expr })
+        Ok(ast::core::ExprStmt { expr })
     }
 
     // expr -> assign-expr

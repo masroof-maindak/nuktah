@@ -12,7 +12,7 @@ pub enum Decl {
 
 #[derive(Debug)]
 pub struct VarDecl {
-    pub t: Type,
+    pub type_tok: Type,
     pub ident: String, // Identifier,
     // AssignOp,
     pub expr: Expr,
@@ -21,7 +21,7 @@ pub struct VarDecl {
 #[derive(Debug)]
 pub struct FnDecl {
     // Fn
-    pub t: Type,
+    pub type_tok: Type,
     pub ident: String, // Identifier,
     // ParenL,
     pub params: Vec<Param>,
@@ -34,7 +34,7 @@ pub type Type = Token; // {Int,String,Float}Lit
 
 #[derive(Debug)]
 pub struct Param {
-    pub t: Type,
+    pub type_tok: Type,
     pub ident: String, // Identifier
 }
 
@@ -76,7 +76,7 @@ pub type RetStmt = ExprStmt;
 
 #[derive(Debug)]
 pub struct ExprStmt {
-    pub e: Expr,
+    pub expr: Expr,
     // Dot
 }
 

@@ -39,7 +39,7 @@ fn generate_function_scope(
     let fn_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::FnBlock);
 
     for param in fn_node.params.iter() {
-        let sym_type = extract_sym_type(&param.t);
+        let sym_type = extract_sym_type(&param.type_tok);
         spaghet.insert_ident_in_node(fn_table_id, &param.ident, SymInfo::new(true, sym_type));
     }
 
@@ -67,7 +67,7 @@ fn analyse_block_scope(
             }
 
             Stmt::Expr(es) | Stmt::Ret(es) => {
-                check_for_undeclared_ident(spaghet, curr_id, &es.e)?;
+                check_for_undeclared_ident(spaghet, curr_id, &es.expr)?;
             }
 
             Stmt::VarDecl(d) => {
@@ -93,7 +93,7 @@ fn generate_for_scope(
     }
 
     // New variables could have been allocated in this for's scope
-    check_for_undeclared_ident(spaghet, for_table_id, &for_node.cond.e)?;
+    check_for_undeclared_ident(spaghet, for_table_id, &for_node.cond.expr)?;
     check_for_undeclared_ident(spaghet, for_table_id, &for_node.updt)?;
 
     analyse_block_scope(spaghet, for_table_id, &for_node.block)?;
@@ -129,7 +129,7 @@ fn insert_var_to_scope(
 
     check_for_undeclared_ident(spaghet, scope_map_id, &v.expr)?;
 
-    let sym_type = extract_sym_type(&v.t);
+    let sym_type = extract_sym_type(&v.type_tok);
     spaghet.insert_ident_in_node(scope_map_id, &v.ident, SymInfo::new(true, sym_type));
     Ok(())
 }
@@ -143,16 +143,16 @@ fn insert_fn_to_scope(
         return Err(ScopeError::VariableRedefinition);
     }
 
-    let sym_type = extract_sym_type(&f.t);
+    let sym_type = extract_sym_type(&f.type_tok);
     spaghet.insert_ident_in_node(scope_map_id, &f.ident, SymInfo::new(false, sym_type));
     Ok(())
 }
 
-fn extract_sym_type(token_type: &Token) -> SymType {
-    match token_type {
+fn extract_sym_type(type_tok: &Token) -> SymType {
+    match type_tok {
         Token::Int => SymType::Int,
         Token::String => SymType::String,
         Token::Float => SymType::Float,
-        _ => unreachable!("parser::consume_prim_type_tok failed..."),
+        _ => unreachable!("type token didn't contain a type..."),
     }
 }
