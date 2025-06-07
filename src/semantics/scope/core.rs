@@ -8,7 +8,7 @@ use crate::semantics::{
 
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
 pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, ScopeError> {
-    let mut spaghet = SpaghettiStack::new();
+    let mut spaghet: SpaghettiStack = Default::default();
     let root_id = spaghet.create_scope_map(None);
 
     for decl in ast_root {

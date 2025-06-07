@@ -91,7 +91,12 @@ impl SpaghettiStack {
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .value
-            .get(ident)
-            .is_some()
+            .contains_key(ident)
+    }
+}
+
+impl Default for SpaghettiStack {
+    fn default() -> Self {
+        Self::new()
     }
 }
