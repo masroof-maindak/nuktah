@@ -7,8 +7,6 @@ use super::{
 use crate::convert_across_err;
 use crate::parser::ast;
 
-// TODO: perform error conversion w/ a macro
-
 #[derive(Debug)]
 pub enum SemanticError {
     ScopeErr(ScopeError),
