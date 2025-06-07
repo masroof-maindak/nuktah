@@ -1,7 +1,13 @@
 fn ginti a(ginti x, ginti y) {} .
 ginti b = a(3, 6) .
-ginti h = 6 * f + 3 * 2 - g * b * x * z .
-ginti c = b .
+ginti f = 1 .
+ginti z = 2.
+ginti h = 6 * f + 3 * 2 - b * b * z * z .
+
+$ Uncommenting this should throw a variable redeclaration error
+$ ginti b = 4 .
+
+ginti c = 10 - (-b * 10 + 12) + (5 - 10).
 
 $ Uncommenting this should throw an error!
 $ ginti c = h .
