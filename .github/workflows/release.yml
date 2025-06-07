@@ -5,30 +5,21 @@ on:
     tags:
       - 'v20[0-9][0-9]-[0-1][0-9]-[0-3][0-9][a-z]' # v2025-06-07a
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-unknown-${{ matrix.os == 'windows-latest' && 'windows-gnu' || matrix.os == 'macos-latest' && 'apple-darwin' || 'linux-gnu' }}
-
+      - uses: actions/checkout@v4
       - name: Build
         run: cargo build --release
-
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
-          name: binary-${{ matrix.os }}
-          path: |
-            target/release/<your_binary_name>${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          name: Linux x86 Binary
+          path: target/release/nktc
 
