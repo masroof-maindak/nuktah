@@ -1,6 +1,7 @@
 name: Build & Release Binary
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v20[0-9][0-9]-[0-1][0-9]-[0-3][0-9][a-z]' # v2025-06-07a
@@ -11,15 +12,26 @@ permissions:
 jobs:
   build:
 
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
       - name: Build
         run: cargo build --release
+
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: Linux x86 Binary
           path: target/release/nktc
+
+      - name: Upload release asset
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          file: ./target/release/nktc
+          asset_name: nktc-${{ github.ref_name }}-linux-x86_64
+          overwrite: true
+
 
