@@ -156,7 +156,7 @@ fn check_primary_expr(
     match expr {
         PrimaryExpr::Ident(ident) => {
             if !sym_exists(spaghet, curr_id, ident) {
-                return Err(ScopeError::UndeclaredIdentifierUsed);
+                return Err(ScopeError::UndefinedIdentifierUsed);
             }
         }
 
@@ -166,8 +166,8 @@ fn check_primary_expr(
 
         PrimaryExpr::Call(fn_call) => {
             // Check if function exists (function definitions are bound to be in the root scope)
-            if !spaghet.does_identifier_exist(0, &fn_call.ident) {
-                return Err(ScopeError::UndeclaredIdentifierUsed);
+            if !spaghet.does_ident_exist(0, &fn_call.ident) {
+                return Err(ScopeError::UndefinedIdentifierUsed);
             }
 
             // Check all arguments
@@ -185,7 +185,7 @@ pub fn sym_exists(spaghet: &SpaghettiStack, curr_id: Id, ident: &str) -> bool {
     let mut node_id: Option<Id> = Some(curr_id);
 
     while node_id.is_some() {
-        if spaghet.does_identifier_exist(node_id.unwrap(), ident) {
+        if spaghet.does_ident_exist(node_id.unwrap(), ident) {
             return true;
         }
 

@@ -77,14 +77,14 @@ impl SpaghettiStack {
         id
     }
 
-    pub fn insert_identifier_in_node(&mut self, node_id: Id, ident: &str, sym_info: SymInfo) {
+    pub fn insert_ident_in_node(&mut self, node_id: Id, ident: &str, sym_info: SymInfo) {
         self.descendants
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
             .insert_val(ident, sym_info);
     }
 
-    pub fn add_node_as_child_of(&mut self, node_id: Id, child_id: Id) {
+    pub fn add_child(&mut self, node_id: Id, child_id: Id) {
         self.descendants
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
@@ -98,7 +98,7 @@ impl SpaghettiStack {
             .parent
     }
 
-    pub fn does_identifier_exist(&self, node_id: Id, ident: &str) -> bool {
+    pub fn does_ident_exist(&self, node_id: Id, ident: &str) -> bool {
         self.descendants
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
