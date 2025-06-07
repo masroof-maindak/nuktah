@@ -5,7 +5,9 @@ use std::fmt::Debug;
 // 1. Type information -> simple; less traversal
 // 2. Reference to AST node AKA weaving -> more information; compact
 //
-// As we don't have structs at the moment, the former will suffice.
+// As we don't have structs at the moment, the former will suffice. Although I think it's possible
+// to make do w/ approach #1 in their presence too, but let's see.
+
 #[derive(Debug)]
 pub enum SymType {
     Int,
@@ -13,13 +15,23 @@ pub enum SymType {
     String,
 }
 
-// CHECK: should I store a bool `is_var` to remember whether an identifier is a variable or a function?
+#[derive(Debug)]
+pub struct SymInfo {
+    is_var: bool,
+    sym_type: SymType,
+}
+
+impl SymInfo {
+    pub fn new(is_var: bool, sym_type: SymType) -> SymInfo {
+        SymInfo { is_var, sym_type }
+    }
+}
 
 pub type Id = usize;
 
 #[derive(Debug)]
 struct ScopeMap {
-    value: HashMap<String, SymType>,
+    value: HashMap<String, SymInfo>,
     parent: Option<Id>,
     children: Vec<Id>,
 }
@@ -33,8 +45,8 @@ impl ScopeMap {
         }
     }
 
-    fn insert_val(&mut self, ident: &str, sym_type: SymType) {
-        self.value.insert(ident.to_string(), sym_type);
+    fn insert_val(&mut self, ident: &str, sym_info: SymInfo) {
+        self.value.insert(ident.to_string(), sym_info);
     }
 
     fn insert_child(&mut self, child_id: Id) {
@@ -65,11 +77,11 @@ impl SpaghettiStack {
         id
     }
 
-    pub fn insert_identifier_in_node(&mut self, node_id: Id, ident: &str, sym_type: SymType) {
+    pub fn insert_identifier_in_node(&mut self, node_id: Id, ident: &str, sym_info: SymInfo) {
         self.descendants
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
-            .insert_val(ident, sym_type);
+            .insert_val(ident, sym_info);
     }
 
     pub fn add_node_as_child_of(&mut self, node_id: Id, child_id: Id) {

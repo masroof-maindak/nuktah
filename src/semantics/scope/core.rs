@@ -1,6 +1,7 @@
 use super::recurse::{check_for_undeclared_ident, sym_exists};
 use crate::lexer::Token;
 use crate::parser::ast::core::*;
+use crate::semantics::spaghetti::SymInfo;
 use crate::semantics::{
     errors::ScopeError,
     spaghetti::{Id, SpaghettiStack, SymType},
@@ -39,7 +40,7 @@ fn generate_function_scope(
 
     for param in fn_node.params.iter() {
         let sym_type = extract_sym_type(&param.t);
-        spaghet.insert_identifier_in_node(fn_table_id, &param.ident, sym_type);
+        spaghet.insert_identifier_in_node(fn_table_id, &param.ident, SymInfo::new(true, sym_type));
     }
 
     analyse_block_scope(spaghet, fn_table_id, &fn_node.block)?;
@@ -129,7 +130,7 @@ fn insert_var_to_scope(
     check_for_undeclared_ident(spaghet, scope_map_id, &d.expr)?;
 
     let sym_type = extract_sym_type(&d.t);
-    spaghet.insert_identifier_in_node(scope_map_id, &d.ident, sym_type);
+    spaghet.insert_identifier_in_node(scope_map_id, &d.ident, SymInfo::new(true, sym_type));
     Ok(())
 }
 
@@ -143,7 +144,7 @@ fn insert_fn_to_scope(
     }
 
     let sym_type = extract_sym_type(&f.t);
-    spaghet.insert_identifier_in_node(scope_map_id, &f.ident, sym_type);
+    spaghet.insert_identifier_in_node(scope_map_id, &f.ident, SymInfo::new(false, sym_type));
     Ok(())
 }
 
