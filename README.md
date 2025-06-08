@@ -16,6 +16,7 @@ fn ginti some_fn() {
 
 ## Installation & Usage
 
+- The shrimplest way to get up and running with the Nuktah compiler is downloading an automatically generated release (x86_64 Linux only)
 - Ensure you have [`cargo` and `rust`](https://www.rust-lang.org/tools/install) (build dependencies) installed and added to your $PATH
 
 ```bash
