@@ -150,7 +150,7 @@ impl SpaghettiStack {
             }
         }
 
-        return None;
+        None
     }
 
     pub fn get_scope_type(&self, node_id: Id) -> ScopeType {
