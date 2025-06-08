@@ -9,7 +9,7 @@
 
 **fn-decl**          -> T\_FUNC • fn-type • T\_IDENTIFIER • T\_PAREN\_L • params • T\_PAREN\_R • block • T\_DOT<br>
 **fn-type**          -> type | T\_VOID<br>
-**type**             -> T\_INT | T\_STRING | T\_FLOAT
+**type**             -> T\_INT | T\_STRING | T\_FLOAT | T\_BOOL
 
 **params**           -> param | param • T\_COMMA • params | EPSILON<br>
 **param**            -> type • T\_IDENTIFIER
@@ -57,7 +57,8 @@
 **unary-expr**       -> primary | unary-op • unary-expr<br>
 **unary-op**         -> T\_SUBOP | T\_BOOLEANOT | T\_BITWISENOT
 
-**primary**          -> T\_INTLIT | T\_FLOATLIT | T\_STRINGLIT | T\_IDENTIFIER | T\_PAREN\_L • expr • T\_PAREN\_R | fn-call
+**primary**          -> T\_INTLIT | T\_FLOATLIT | T\_STRINGLIT | bool-lit | T\_IDENTIFIER | T\_PAREN\_L • expr • T\_PAREN\_R | fn-call
+**bool-lit**         -> T\_TRUELIT |T\_FALSELIT
 
 **fn-call**          -> T\_IDENTIFIER • T\_PAREN\_L • fn-args • T\_PAREN\_R<br>
 **fn-args**          -> expr | expr • T\_COMMA • fn-args | EPSILON

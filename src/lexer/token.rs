@@ -8,12 +8,15 @@ pub enum Token {
     Struct,
     Break,
 
-    // ginti, jumla, asharia, khali, fn
+    // ginti, jumla, asharia, khali, fn, han, na
     Int,
     String,
     Float,
+    Bool,
     Void,
     Function,
+    True,
+    False,
 
     // (), {}, [], `, ", '
     ParenL,

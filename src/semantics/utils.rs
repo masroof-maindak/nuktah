@@ -7,6 +7,7 @@ pub fn token_to_symtype(type_tok: &Token, is_var: bool) -> SymType {
         Token::Int => SymType::Int,
         Token::String => SymType::String,
         Token::Float => SymType::Float,
+        Token::Bool => SymType::Bool,
 
         // Unreachable as these shouldn't have made it past the parsing stage
         Token::Void => {

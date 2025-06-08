@@ -53,9 +53,11 @@ cargo build -r
     - [x] Variable declarations -> Literals' type == token type
     - [x] Function definitions -> return type == token type
     - [x] Function to get id of nth scope-type child, of a given node
+    - [ ] Type-checking of for/if
     - [ ] Recursive-descent expression chain
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
+- [x] Add a boolean type
 - [ ] Init IR generation
 - [ ] Eliminate `mod.rs` files
 - [ ] Unit tests

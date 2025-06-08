@@ -219,6 +219,7 @@ impl PrimaryExpr {
             PrimaryExpr::IntLit(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::FloatLit(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::StringLit(e) => write!(f, "\n{}{:?}", indent_str, e),
+            PrimaryExpr::BoolLit(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::Ident(e) => write!(f, "\n{}{:?}", indent_str, e),
             PrimaryExpr::Paren(e) => fmt_option_assign_expr(e, f, indent + 1),
             PrimaryExpr::Call(fn_call) => {

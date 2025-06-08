@@ -11,8 +11,9 @@ use std::fmt::Debug;
 #[derive(Debug, PartialEq, Clone)]
 pub enum SymType {
     Int,
-    Float,
     String,
+    Float,
+    Bool,
     Void,
 }
 

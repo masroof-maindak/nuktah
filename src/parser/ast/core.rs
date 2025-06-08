@@ -30,7 +30,7 @@ pub struct FnDecl {
     // Dot
 }
 
-pub type Type = Token; // {Int,String,Float}Lit
+pub type Type = Token; // {Int,String,Float,Bool}
 
 #[derive(Debug)]
 pub struct Param {
@@ -175,6 +175,7 @@ pub enum PrimaryExpr {
     IntLit(i64),
     FloatLit(f64),
     StringLit(String),
+    BoolLit(bool),
     Ident(String),
     Paren(
         // ParenL

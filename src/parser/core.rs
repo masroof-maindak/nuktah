@@ -11,8 +11,11 @@ pub enum ParseError {
     ExpectedFloatLit,
     ExpectedIntLit,
     ExpectedStringLit,
+    ExpectedBoolLit,
     ExpectedExpr,
 }
+
+const PRIMITIVE_TYPES: [Token; 4] = [Token::Int, Token::String, Token::Float, Token::Bool];
 
 pub fn parse_token_stream(tokens: &Vec<Token>) -> Result<ast::core::TranslationUnit, ParseError> {
     let mut p = Parser::new(tokens);
@@ -70,7 +73,7 @@ impl<'a> Parser<'a> {
 
     fn consume_prim_type_tok(&mut self) -> Result<ast::core::Type, ParseError> {
         if let Some(t) = self.peek().cloned() {
-            if [Token::Int, Token::String, Token::Float].contains(&t) {
+            if PRIMITIVE_TYPES.contains(&t) {
                 self.advance();
                 return Ok(t);
             }
@@ -240,7 +243,7 @@ impl<'a> Parser<'a> {
                 Token::For => stmts.push(ast::core::Stmt::For(self.parse_for_stmt()?)),
                 Token::If => stmts.push(ast::core::Stmt::If(self.parse_if_stmt()?)),
                 Token::Return => stmts.push(ast::core::Stmt::Ret(self.parse_ret_stmt()?)),
-                Token::Int | Token::String | Token::Float => {
+                t if PRIMITIVE_TYPES.contains(t) => {
                     stmts.push(ast::core::Stmt::VarDecl(self.parse_var_decl()?))
                 }
                 Token::Break => {
@@ -500,7 +503,8 @@ impl<'a> Parser<'a> {
         }
     }
 
-    // primary-expr -> T_IDENTIFIER | T_INTLIT | T_FLOATLIT | T_STRINGLIT | T_PAREN_L • expr • T_PAREN_R | fn-call
+    // primary-expr -> T_IDENTIFIER | T_INTLIT | T_FLOATLIT | T_STRINGLIT | bool-lit | T_PAREN_L • expr • T_PAREN_R | fn-call
+    // bool-lit -> T_TRUE | T_FALSE
     fn parse_primary_expr(&mut self) -> Result<ast::core::PrimaryExpr, ParseError> {
         if self.peek().is_none() {
             return Err(ParseError::UnexpectedEOF);
@@ -524,6 +528,16 @@ impl<'a> Parser<'a> {
             Token::FloatLit(_) => {
                 let f_lit = self.consume_floatlit()?;
                 Ok(ast::core::PrimaryExpr::FloatLit(f_lit))
+            }
+
+            Token::True => {
+                self.advance();
+                Ok(ast::core::PrimaryExpr::BoolLit(true))
+            }
+
+            Token::False => {
+                self.advance();
+                Ok(ast::core::PrimaryExpr::BoolLit(false))
             }
 
             Token::Quotes => {

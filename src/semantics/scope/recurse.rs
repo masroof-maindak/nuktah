@@ -175,8 +175,12 @@ fn check_primary_expr(
                 check_for_undeclared_ident(spaghet, curr_id, arg)?;
             }
         }
+
         // Other literals don't need checking
-        PrimaryExpr::IntLit(_) | PrimaryExpr::FloatLit(_) | PrimaryExpr::StringLit(_) => {}
+        PrimaryExpr::IntLit(_)
+        | PrimaryExpr::FloatLit(_)
+        | PrimaryExpr::StringLit(_)
+        | PrimaryExpr::BoolLit(_) => {}
     }
     Ok(())
 }
