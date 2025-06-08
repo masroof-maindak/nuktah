@@ -7,8 +7,9 @@ pub enum ScopeError {
 
 #[derive(Debug)]
 pub enum TypeChkError {
+    ErroneousVarDecl,
     FunctionCallAndPrototypeMismatch,
-    VariableLiteralValueAssignment,
-    VariableExpressionAssignment,
+    ErroneousReturnType,
     ExpectedBooleanExpression,
+    ErroneousBreak,
 }

@@ -5,14 +5,14 @@ pub mod semantics;
 
 #[derive(Debug)]
 pub enum CompilerError {
-    Lexer(lexer::core::LexerError),
-    Parser(parser::core::ParseError),
-    Semantics(semantics::core::SemanticError),
+    TokenizationErr(lexer::core::LexerError),
+    ParseErr(parser::core::ParseError),
+    SemanticErr(semantics::core::SemanticError),
 }
 
-convert_across_err!(lexer::core::LexerError, CompilerError, Lexer);
-convert_across_err!(parser::core::ParseError, CompilerError, Parser);
-convert_across_err!(semantics::core::SemanticError, CompilerError, Semantics);
+convert_across_err!(lexer::core::LexerError, CompilerError, TokenizationErr);
+convert_across_err!(parser::core::ParseError, CompilerError, ParseErr);
+convert_across_err!(semantics::core::SemanticError, CompilerError, SemanticErr);
 
 pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     let tokens = lexer::core::tokenize_src_code(src_code)?;

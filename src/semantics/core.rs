@@ -9,12 +9,12 @@ use crate::parser::ast;
 
 #[derive(Debug)]
 pub enum SemanticError {
-    Scope(ScopeError),
-    TypeChk(TypeChkError),
+    ScopeErr(ScopeError),
+    TypeChkErr(TypeChkError),
 }
 
-convert_across_err!(ScopeError, SemanticError, Scope);
-convert_across_err!(TypeChkError, SemanticError, TypeChk);
+convert_across_err!(ScopeError, SemanticError, ScopeErr);
+convert_across_err!(TypeChkError, SemanticError, TypeChkErr);
 
 pub fn analyse_semantics(
     ast_root: &ast::core::TranslationUnit,
