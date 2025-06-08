@@ -53,6 +53,7 @@ cargo build -r
     - [ ] Variable declarations -> Literals' type == token type
     - [ ] Function definitions -> return type == token type
     - [ ] Recursive-descent expression chain(?)
+- [x] **bug**: parsing of string declarations
 - [ ] Init IR generation
 - [ ] Eliminate `mod.rs` files
 - [ ] Unit tests

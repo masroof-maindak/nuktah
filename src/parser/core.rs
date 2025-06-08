@@ -526,8 +526,10 @@ impl<'a> Parser<'a> {
                 Ok(ast::core::PrimaryExpr::FloatLit(f_lit))
             }
 
-            Token::StringLit(_) => {
+            Token::Quotes => {
+                self.consume(Token::Quotes)?;
                 let str = self.consume_stringlit()?;
+                self.consume(Token::Quotes)?;
                 Ok(ast::core::PrimaryExpr::StringLit(str))
             }
 

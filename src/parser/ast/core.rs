@@ -42,12 +42,12 @@ pub type Block = Vec<Stmt>;
 
 #[derive(Debug)]
 pub enum Stmt {
-    For(ForStmt),
-    If(IfStmt),
-    Ret(RetStmt),
-    VarDecl(VarDecl),
-    Expr(ExprStmt),
-    Break,
+    For(ForStmt),     // duhrao (..) {}
+    If(IfStmt),       // agar (a == 10) {} warna {}
+    Ret(RetStmt),     // wapsi a .
+    VarDecl(VarDecl), // ginti a = 10 .
+    Expr(ExprStmt),   // 10 * 10
+    Break,            // toro
 }
 
 #[derive(Debug)]
