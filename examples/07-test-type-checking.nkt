@@ -1,0 +1,5 @@
+fn ginti some_fn() {
+	jumla str = "hmm" .
+	wapsi str .
+} .
+

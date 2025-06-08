@@ -1,10 +1,10 @@
-use super::recurse::{check_for_undeclared_ident, sym_exists};
-use crate::lexer::Token;
+use super::recurse::check_for_undeclared_ident;
 use crate::parser::ast::core::*;
 use crate::semantics::spaghetti::SymInfo;
 use crate::semantics::{
     errors::ScopeError,
-    spaghetti::{Id, ScopeType, SpaghettiStack, SymType},
+    spaghetti::{Id, ScopeType, SpaghettiStack},
+    utils::{find_info_in_table, token_to_symtype},
 };
 
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
@@ -39,7 +39,7 @@ fn generate_function_scope(
     let fn_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::FnBlock);
 
     for param in fn_node.params.iter() {
-        let sym_type = extract_sym_type(&param.type_tok);
+        let sym_type = token_to_symtype(&param.type_tok, true);
         spaghet.insert_ident_in_node(fn_table_id, &param.ident, SymInfo::new(true, sym_type));
     }
 
@@ -53,7 +53,7 @@ fn analyse_block_scope(
     curr_id: Id,
     block: &Block,
 ) -> Result<(), ScopeError> {
-    for stmt in block.iter() {
+    for stmt in block {
         match stmt {
             Stmt::For(f) => {
                 let for_table_id = generate_for_scope(spaghet, curr_id, f)?;
@@ -120,39 +120,30 @@ fn generate_if_scope(
 
 fn insert_var_to_scope(
     spaghet: &mut SpaghettiStack,
-    scope_map_id: Id,
+    node_id: Id,
     v: &VarDecl,
 ) -> Result<(), ScopeError> {
-    if sym_exists(spaghet, scope_map_id, &v.ident) {
+    if find_info_in_table(spaghet, node_id, &v.ident, true).is_some() {
         return Err(ScopeError::VariableRedefinition);
     }
 
-    check_for_undeclared_ident(spaghet, scope_map_id, &v.expr)?;
+    check_for_undeclared_ident(spaghet, node_id, &v.expr)?;
 
-    let sym_type = extract_sym_type(&v.type_tok);
-    spaghet.insert_ident_in_node(scope_map_id, &v.ident, SymInfo::new(true, sym_type));
+    let sym_type = token_to_symtype(&v.type_tok, true);
+    spaghet.insert_ident_in_node(node_id, &v.ident, SymInfo::new(true, sym_type));
     Ok(())
 }
 
 fn insert_fn_to_scope(
     spaghet: &mut SpaghettiStack,
-    scope_map_id: Id,
+    node_id: Id,
     f: &FnDecl,
 ) -> Result<(), ScopeError> {
-    if sym_exists(spaghet, scope_map_id, &f.ident) {
+    if find_info_in_table(spaghet, node_id, &f.ident, false).is_some() {
         return Err(ScopeError::VariableRedefinition);
     }
 
-    let sym_type = extract_sym_type(&f.type_tok);
-    spaghet.insert_ident_in_node(scope_map_id, &f.ident, SymInfo::new(false, sym_type));
+    let sym_type = token_to_symtype(&f.type_tok, false);
+    spaghet.insert_ident_in_node(node_id, &f.ident, SymInfo::new(false, sym_type));
     Ok(())
-}
-
-fn extract_sym_type(type_tok: &Token) -> SymType {
-    match type_tok {
-        Token::Int => SymType::Int,
-        Token::String => SymType::String,
-        Token::Float => SymType::Float,
-        _ => unreachable!("type token didn't contain a type..."),
-    }
 }

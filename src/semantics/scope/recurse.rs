@@ -1,4 +1,5 @@
 use crate::parser::ast::core::*;
+use crate::semantics::utils::find_info_in_table;
 use crate::semantics::{
     errors::ScopeError,
     spaghetti::{Id, SpaghettiStack},
@@ -155,7 +156,7 @@ fn check_primary_expr(
 ) -> Result<(), ScopeError> {
     match expr {
         PrimaryExpr::Ident(ident) => {
-            if !sym_exists(spaghet, curr_id, ident) {
+            if find_info_in_table(spaghet, curr_id, ident, true).is_none() {
                 return Err(ScopeError::UndefinedIdentifierUsed);
             }
         }
@@ -165,8 +166,7 @@ fn check_primary_expr(
         }
 
         PrimaryExpr::Call(fn_call) => {
-            // Check if function exists (function definitions are bound to be in the root scope)
-            if !spaghet.does_ident_exist(0, &fn_call.ident) {
+            if find_info_in_table(spaghet, curr_id, &fn_call.ident, false).is_none() {
                 return Err(ScopeError::UndefinedIdentifierUsed);
             }
 
@@ -179,18 +179,4 @@ fn check_primary_expr(
         PrimaryExpr::IntLit(_) | PrimaryExpr::FloatLit(_) | PrimaryExpr::StringLit(_) => {}
     }
     Ok(())
-}
-
-pub fn sym_exists(spaghet: &SpaghettiStack, curr_id: Id, ident: &str) -> bool {
-    let mut node_id: Option<Id> = Some(curr_id);
-
-    while node_id.is_some() {
-        if spaghet.does_ident_exist(node_id.unwrap(), ident) {
-            return true;
-        }
-
-        node_id = spaghet.get_node_parent_id(node_id.unwrap());
-    }
-
-    false
 }

@@ -50,9 +50,11 @@ cargo build -r
 - [ ] Type-checker
     - [x] Store whether symbol belongs to var/func in symbol table
     - [x] Store type of scope in ScopeMap
-    - [ ] Variable declarations -> Literals' type == token type
-    - [ ] Function definitions -> return type == token type
-    - [ ] Recursive-descent expression chain(?)
+    - [x] Variable declarations -> Literals' type == token type
+    - [x] Function definitions -> return type == token type
+    - [x] Function to get id of nth scope-type child, of a given node
+    - [ ] Recursive-descent expression chain
+- [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [ ] Init IR generation
 - [ ] Eliminate `mod.rs` files

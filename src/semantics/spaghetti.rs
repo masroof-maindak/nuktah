@@ -8,17 +8,24 @@ use std::fmt::Debug;
 // As we don't have structs at the moment, the former will suffice. Although I think it's possible
 // to make do w/ approach #1 in their presence too, but let's see.
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum SymType {
     Int,
     Float,
     String,
+    Void,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SymInfo {
     is_var: bool,
     sym_type: SymType,
+}
+
+impl SymInfo {
+    pub fn is_var(&self) -> bool {
+        self.is_var
+    }
 }
 
 impl SymInfo {
@@ -27,7 +34,7 @@ impl SymInfo {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum ScopeType {
     Root,
     FnBlock,
@@ -109,12 +116,48 @@ impl SpaghettiStack {
             .parent
     }
 
-    pub fn does_ident_exist(&self, node_id: Id, ident: &str) -> bool {
+    pub fn get_ident_info(&self, node_id: Id, ident: &str) -> Option<&SymInfo> {
         self.descendants
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .value
-            .contains_key(ident)
+            .get(ident)
+    }
+
+    /// In a provided scope, return the nth child scope that matches the given scope type. The
+    /// caller should probably supplement this w/ a counter on their side.
+    pub fn get_nth_child_of_type(
+        &self,
+        node_id: Id,
+        n: usize,
+        child_scope_type: ScopeType,
+    ) -> Option<Id> {
+        let mut ctr = 0;
+        for id in self
+            .descendants
+            .get(&node_id)
+            .expect("id should point to valid ScopeMap")
+            .children
+            .iter()
+        {
+            if child_scope_type == self.descendants.get(id).unwrap().scope_type {
+                ctr += 1;
+            }
+
+            if ctr == n {
+                return Some(*id);
+            }
+        }
+
+        return None;
+    }
+
+    pub fn get_scope_type(&self, node_id: Id) -> ScopeType {
+        self.descendants
+            .get(&node_id)
+            .expect("id should point to valid ScopeMap")
+            .scope_type
+            .clone()
     }
 }
 

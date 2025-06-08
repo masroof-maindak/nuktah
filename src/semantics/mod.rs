@@ -4,3 +4,4 @@ pub mod spaghetti;
 mod errors;
 mod scope;
 mod typchk;
+mod utils;
