@@ -109,8 +109,8 @@ fn check_block(
                 }
             }
 
-            Stmt::Ret(es) => {
-                if get_expr_type(spaghet, &es.expr, node_id)? != *expected_ret_type {
+            Stmt::Ret(r) => {
+                if get_expr_type(spaghet, &r.expr, node_id)? != *expected_ret_type {
                     return Err(TypeChkError::ErroneousReturnType);
                 }
             }
