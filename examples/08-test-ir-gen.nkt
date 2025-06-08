@@ -1,0 +1,15 @@
+fn ginti main() {
+    ginti x = 0 .
+    
+    duhrao (ginti a = 0 . a < 10 . a = a + 1) {
+        duhrao (ginti b = 0 . b < a . b = b + 1) {
+            agar (b < 5) { 
+                x = x + 1 . 
+            } warna { 
+                x = x + 2 .
+            }
+        } 
+    }
+
+    wapsi x .
+} .

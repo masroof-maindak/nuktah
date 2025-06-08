@@ -81,6 +81,7 @@ fn tac_value_to_string(value: &TacValue) -> String {
         TacValue::IntLit(val) => val.to_string(),
         TacValue::FloatLit(val) => val.to_string(),
         TacValue::StringLit(val) => format!("\"{}\"", val),
+        TacValue::BoolLit(val) => val.to_string()
     }
 }
 
