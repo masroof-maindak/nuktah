@@ -54,7 +54,7 @@ cargo build -r
     - [x] Variable declarations -> Literals' type == token type
     - [x] Function definitions -> return type == token type
     - [x] Function to get id of nth scope-type child, of a given node
-    - [ ] Type-checking of for/if
+    - [x] Type-checking of for/if
     - [ ] Recursive-descent expression chain
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
@@ -67,3 +67,13 @@ cargo build -r
 - [ ] Rewrite expression printing rules (for the AST) w/ macros
 - [ ] Eliminate Rust anti-pattern: String cloning w.r.t `Token::StringLit`
 - [ ] Combine all expression precedence functions into one and use a table
+
+## Acknowledgements
+
+#### Parsing
+
+- The Dragon Book
+- [C's grammar](https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm)
+- [Simple but Powerful Pratt Parsing - Matklad](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
+- [Parsing Expressions by Precedence Climbing - Eli Bendersky](https://eli.thegreenplace.net/2012/08/02/parsing-expressions-by-precedence-climbing)
+- [Parsing Expressions by Recursive Descent - Theodore Norvell](https://www.engr.mun.ca/~theo/Misc/exp_parsing.htm)
