@@ -83,11 +83,11 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
         "ginti" => Ok(Token::Int),
         "asharia" => Ok(Token::Float),
         "jumla" => Ok(Token::String),
-        "sach" => Ok(Token::Bool),
+        "boli" => Ok(Token::Bool),
         "khali" => Ok(Token::Void),
         "fn" => Ok(Token::Function),
-        "jee" => Ok(Token::True),
-        "nahi" => Ok(Token::False),
+        "sach" => Ok(Token::True),
+        "jhoot" => Ok(Token::False),
 
         "(" => Ok(Token::ParenL),
         ")" => Ok(Token::ParenR),
@@ -147,11 +147,10 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
 
 fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quotes_started: bool) {
     if token_list.is_empty()
+        // TODO: we can probably safely remove this match
         || !matches!(
             curr_token,
-            Token::AddOp
-                | Token::SubOp
-                | Token::AssignOp
+                Token::AssignOp
                 | Token::Whitespace
                 | Token::Quotes
                 | Token::LessThan
@@ -194,7 +193,7 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
         }
     }
 
-    // ==, <<, >>, &&, || from =, <, >, &, |
+    // `==, <<, >>, &&, ||` from `=, <, >, &, |`
     if *last_token == *curr_token {
         //  qs - !ws => POP
         // !qs - !ws => POP
