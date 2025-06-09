@@ -294,7 +294,15 @@ fn get_fn_call_type(
             unreachable!("argument to function is None");
         }
 
-        todo!();
+        // TODO: Argument type-checking
+        //
+        // Iterate up scopes, and stop when the fn_call.ident's scope 'x' is found
+        // (how would we identify that we are in scope x? The fn's ident would be a
+        // child in the parent scope.
+        //
+        // Check whether the two vectors (scopemap_of_x.params & fn_call.args) have
+        // the same size, and that their correponding indexes have the same type (i.e
+        // fn_call.args[i].type == scopemap.param_types[i]).
     }
 
     Ok(fn_type.get_type())
