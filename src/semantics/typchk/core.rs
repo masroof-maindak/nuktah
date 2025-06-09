@@ -10,7 +10,7 @@ use crate::{
 
 const ROOT_ID: Id = 0;
 
-/// For a given scope of Id `n`, how many nested scopes of it have we encountered?
+// How many nested scopes of diff. types have we encountered within a given scope?
 struct ScopeTypeCounter {
     _fn: usize,
     _for: usize,

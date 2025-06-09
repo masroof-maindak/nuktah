@@ -60,14 +60,14 @@ cargo build -r
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [x] Add a boolean type
-- [ ] Init IR generation
+- [ ] `ir_gen`
 - [ ] Eliminate `mod.rs` files
 - [ ] Unit tests
 - [ ] Arrays
 - [ ] Structs
+- [ ] `asm_gen` -> ARM?
 - [ ] Rewrite expression printing rules (for the AST) w/ macros
 - [ ] Eliminate Rust anti-pattern: String cloning w.r.t `Token::StringLit`
-- [ ] Combine all expression precedence functions into one and use a table
 
 ## Acknowledgements
 
