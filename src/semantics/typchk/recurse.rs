@@ -122,7 +122,8 @@ fn get_comp_expr_type(
                 return Err(TypeChkError::ExpressionTypeMismatch);
             }
 
-            Ok(lhs_type)
+            // Comparison always produces a bool
+            Ok(SymType::Bool)
         }
     }
 }
