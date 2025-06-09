@@ -340,7 +340,7 @@ impl<'a> Parser<'a> {
         let left = self.parse_bool_expr()?;
         let ret: ast::core::AssignExpr;
 
-        // NOTE: the idea is that the right hand side, by virtue of a recursive call, will
+        // The idea is that the right hand side, by virtue of a recursive call, will
         // automatically resolve another assignment expression -- and this would naturally
         // comprise the right tree
 

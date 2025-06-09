@@ -1,7 +1,7 @@
 use super::spaghetti::{Id, SpaghettiStack, SymInfo, SymType};
 use crate::lexer::Token;
 
-/// Convert's a Token to a SymType
+/// Converts a Token to a SymType
 pub fn token_to_symtype(type_tok: &Token, is_var: bool) -> SymType {
     match type_tok {
         Token::Int => SymType::Int,
@@ -17,7 +17,7 @@ pub fn token_to_symtype(type_tok: &Token, is_var: bool) -> SymType {
                 unreachable!("variable declaration w/ type void is illegal");
             }
         }
-        _ => unreachable!("invalid function type found"),
+        _ => unreachable!("invalid data type found"),
     }
 }
 
@@ -29,7 +29,7 @@ pub fn find_info_in_table(
     ident: &str,
     is_var: bool,
 ) -> Option<SymInfo> {
-    // TODO: add this as a method of SpaghettiStack
+    // TODO: Encapsulate this logic inside SpaghettiStack
     let mut curr_id: Option<Id> = Some(node_id);
 
     while curr_id.is_some() {

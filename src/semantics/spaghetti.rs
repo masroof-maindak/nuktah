@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashMap};
 use std::fmt::Debug;
 
-// NOTE: Symbol 'information' usually comprises one of either two things
+// Symbol 'information' usually comprises one of either two things
 // 1. Type information -> simple; less traversal
 // 2. Reference to AST node AKA weaving -> more information; compact
 //

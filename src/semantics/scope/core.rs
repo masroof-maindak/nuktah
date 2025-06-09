@@ -70,8 +70,8 @@ fn analyse_block_scope(
                 check_for_undeclared_ident(spaghet, curr_id, &es.expr)?;
             }
 
-            Stmt::VarDecl(d) => {
-                insert_var_to_scope(spaghet, curr_id, d)?;
+            Stmt::VarDecl(v) => {
+                insert_var_to_scope(spaghet, curr_id, v)?;
             }
 
             Stmt::Break => {} // ignore
