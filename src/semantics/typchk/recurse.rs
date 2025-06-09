@@ -270,11 +270,8 @@ fn get_primary_expr_type(
             let sym_info = fetch_guaranteed_info_from_table(spaghet, ident, node_id, true);
             Ok(sym_info.get_type())
         }
-
         PrimaryExpr::Paren(nested_e) => get_expr_type(spaghet, nested_e, node_id),
-
         PrimaryExpr::Call(fn_call) => get_fn_call_type(spaghet, fn_call, node_id),
-
         PrimaryExpr::IntLit(_) => Ok(SymType::Int),
         PrimaryExpr::FloatLit(_) => Ok(SymType::Float),
         PrimaryExpr::StringLit(_) => Ok(SymType::String),
@@ -288,21 +285,20 @@ fn get_fn_call_type(
     node_id: Id,
 ) -> Result<SymType, TypeChkError> {
     let fn_type = fetch_guaranteed_info_from_table(spaghet, &fn_call.ident, node_id, false);
+    let param_types = spaghet.get_fn_param_types(&fn_call.ident);
 
-    for arg in fn_call.args.iter() {
+    if param_types.len() != fn_call.args.len() {
+        return Err(TypeChkError::FnCallParamCount);
+    }
+
+    for (i, arg) in fn_call.args.iter().enumerate() {
         if arg.is_none() {
             unreachable!("argument to function is None");
         }
 
-        // TODO: Argument type-checking
-        //
-        // Iterate up scopes, and stop when the fn_call.ident's scope 'x' is found
-        // (how would we identify that we are in scope x? The fn's ident would be a
-        // child in the parent scope.
-        //
-        // Check whether the two vectors (scopemap_of_x.params & fn_call.args) have
-        // the same size, and that their correponding indexes have the same type (i.e
-        // fn_call.args[i].type == scopemap.param_types[i]).
+        if get_expr_type(spaghet, arg, node_id)? != param_types[i] {
+            return Err(TypeChkError::FnCallParamType);
+        }
     }
 
     Ok(fn_type.get_type())

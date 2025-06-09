@@ -1,5 +1,13 @@
-fn ginti some_fn() {
-	jumla str = "hmm" .
-	wapsi str .
+fn ginti some_fn(ginti x, asharia y) {
+	$ jumla my_str = "hmm" .
+
+	boli my_bool = x == 40 .
+
+	wapsi x .
 } .
 
+$ Throws a type error!
+$ ginti ret = some_fn(10, "fake lit") .
+
+$ Works fine.
+$ ginti ret = some_fn(10, 3.14159) .

@@ -48,7 +48,7 @@ cargo build -r
 - [x] Refactor into separate sub-modules
 - [x] CI/CD -> Build/Release
 - [x] Use macros for error conversions
-- [ ] Type-checker
+- [x] Type-checker
     - [x] Store whether symbol belongs to var/func in symbol table
     - [x] Store type of scope in ScopeMap
     - [x] Variable declarations -> Literals' type == token type
@@ -56,7 +56,7 @@ cargo build -r
     - [x] Function to get id of nth scope-type child, of a given node
     - [x] Type-checking of for/if
     - [x] Recursive-descent expression chain
-    - [ ] Type-check arguments to functions
+    - [x] Type-check arguments to functions
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [x] Add a boolean type

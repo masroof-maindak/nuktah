@@ -24,18 +24,16 @@ pub struct SymInfo {
 }
 
 impl SymInfo {
+    pub fn new(is_var: bool, sym_type: SymType) -> SymInfo {
+        SymInfo { is_var, sym_type }
+    }
+
     pub fn is_var(&self) -> bool {
         self.is_var
     }
 
     pub fn get_type(&self) -> SymType {
         self.sym_type
-    }
-}
-
-impl SymInfo {
-    pub fn new(is_var: bool, sym_type: SymType) -> SymInfo {
-        SymInfo { is_var, sym_type }
     }
 }
 
@@ -52,19 +50,31 @@ pub type Id = usize;
 #[derive(Debug)]
 struct ScopeMap {
     scope_type: ScopeType,
+
     parent: Option<Id>,
+
     children: Vec<Id>,
-    value: HashMap<String, SymInfo>,
-    param_types: Vec<SymType>,
+
+    // NOTE: shitty solution to find a function's scope from just a name by
+    // performing a linear search. See:
+    // SpaghettiStack::get_fn_scope_id. A better (but arguably more
+    // invasive) approach could be to store it as part of the 'value' in
+    // the identifiers hashmap
+    scope_name: Option<String>,
+
+    symbols: HashMap<String, SymInfo>,
+
+    param_types: Vec<SymType>, // In case this a is the scope of a function
 }
 
 impl ScopeMap {
-    fn new(parent_id: Option<Id>, scope_type: ScopeType) -> ScopeMap {
+    fn new(parent_id: Option<Id>, scope_type: ScopeType, scope_name: Option<String>) -> ScopeMap {
         ScopeMap {
             scope_type,
             parent: parent_id,
             children: vec![],
-            value: HashMap::new(),
+            scope_name,
+            symbols: HashMap::new(),
             param_types: vec![],
         }
     }
@@ -73,11 +83,15 @@ impl ScopeMap {
         if is_param {
             self.param_types.push(sym_info.get_type());
         }
-        self.value.insert(ident.to_string(), sym_info);
+        self.symbols.insert(ident.to_string(), sym_info);
     }
 
     fn insert_child(&mut self, child_id: Id) {
         self.children.push(child_id);
+    }
+
+    fn get_param_types(&self) -> &Vec<SymType> {
+        &self.param_types
     }
 }
 
@@ -98,10 +112,16 @@ impl SpaghettiStack {
         }
     }
 
-    pub fn create_scope_map(&mut self, parent_id: Option<Id>, scope_type: ScopeType) -> Id {
+    pub fn create_scope_map(
+        &mut self,
+        parent_id: Option<Id>,
+        scope_type: ScopeType,
+        scope_name: Option<String>,
+    ) -> Id {
         let id = self.descendants.len();
         self.descendants
-            .insert(id, ScopeMap::new(parent_id, scope_type));
+            .insert(id, ScopeMap::new(parent_id, scope_type, scope_name));
+
         id
     }
 
@@ -145,7 +165,7 @@ impl SpaghettiStack {
         self.descendants
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
-            .value
+            .symbols
             .get(ident)
     }
 
@@ -183,6 +203,36 @@ impl SpaghettiStack {
             .expect("id should point to valid ScopeMap")
             .scope_type
             .clone()
+    }
+
+    pub fn get_fn_param_types(&self, ident: &str) -> &Vec<SymType> {
+        self.descendants
+            .get(&self.get_fn_scope_id(ident))
+            .expect("id should point to valid ScopeMap")
+            .get_param_types()
+    }
+
+    fn get_fn_scope_id(&self, ident: &str) -> Id {
+        for c_idx in self
+            .descendants
+            .get(&0)
+            .expect("id should point to valid ScopeMap")
+            .children
+            .clone()
+        {
+            if self
+                .descendants
+                .get(&c_idx)
+                .unwrap()
+                .scope_name
+                .clone()
+                .is_some_and(|fn_name| fn_name == ident)
+            {
+                return c_idx;
+            }
+        }
+
+        unreachable!("function being searched for doesn't exist")
     }
 }
 
