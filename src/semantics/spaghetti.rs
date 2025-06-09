@@ -55,6 +55,7 @@ struct ScopeMap {
     parent: Option<Id>,
     children: Vec<Id>,
     value: HashMap<String, SymInfo>,
+    param_types: Vec<SymType>,
 }
 
 impl ScopeMap {
@@ -64,10 +65,14 @@ impl ScopeMap {
             parent: parent_id,
             children: vec![],
             value: HashMap::new(),
+            param_types: vec![],
         }
     }
 
-    fn insert_val(&mut self, ident: &str, sym_info: SymInfo) {
+    fn insert_val(&mut self, ident: &str, sym_info: SymInfo, is_param: bool) {
+        if is_param {
+            self.param_types.push(sym_info.get_type());
+        }
         self.value.insert(ident.to_string(), sym_info);
     }
 
@@ -100,11 +105,26 @@ impl SpaghettiStack {
         id
     }
 
-    pub fn insert_ident_in_node(&mut self, node_id: Id, ident: &str, sym_info: SymInfo) {
-        self.descendants
+    pub fn insert_ident_in_node(
+        &mut self,
+        node_id: Id,
+        ident: &str,
+        sym_info: SymInfo,
+        is_param: bool,
+    ) {
+        let scope_map = self
+            .descendants
             .get_mut(&node_id)
-            .expect("id should point to valid ScopeMap")
-            .insert_val(ident, sym_info);
+            .expect("id should point to valid ScopeMap");
+
+        if is_param {
+            assert!(
+                scope_map.scope_type == ScopeType::FnBlock,
+                "attempted to insert parameter in non-function scope"
+            )
+        }
+
+        scope_map.insert_val(ident, sym_info, is_param);
     }
 
     pub fn add_child(&mut self, node_id: Id, child_id: Id) {

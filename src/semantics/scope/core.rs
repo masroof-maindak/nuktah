@@ -40,7 +40,12 @@ fn generate_function_scope(
 
     for param in fn_node.params.iter() {
         let sym_type = token_to_symtype(&param.type_tok, true);
-        spaghet.insert_ident_in_node(fn_table_id, &param.ident, SymInfo::new(true, sym_type));
+        spaghet.insert_ident_in_node(
+            fn_table_id,
+            &param.ident,
+            SymInfo::new(true, sym_type),
+            true,
+        );
     }
 
     analyse_block_scope(spaghet, fn_table_id, &fn_node.block)?;
@@ -130,7 +135,7 @@ fn insert_var_to_scope(
     check_for_undeclared_ident(spaghet, node_id, &v.expr)?;
 
     let sym_type = token_to_symtype(&v.type_tok, true);
-    spaghet.insert_ident_in_node(node_id, &v.ident, SymInfo::new(true, sym_type));
+    spaghet.insert_ident_in_node(node_id, &v.ident, SymInfo::new(true, sym_type), false);
     Ok(())
 }
 
@@ -144,6 +149,6 @@ fn insert_fn_to_scope(
     }
 
     let sym_type = token_to_symtype(&f.type_tok, false);
-    spaghet.insert_ident_in_node(node_id, &f.ident, SymInfo::new(false, sym_type));
+    spaghet.insert_ident_in_node(node_id, &f.ident, SymInfo::new(false, sym_type), false);
     Ok(())
 }
