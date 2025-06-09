@@ -9,7 +9,7 @@ use crate::semantics::{
 /// Traverses AST, generating a symbol table (spaghetti stack) as it goes.
 pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, ScopeError> {
     let mut spaghet: SpaghettiStack = Default::default();
-    let root_id = spaghet.create_scope_map(None, ScopeType::Root, None);
+    let root_id = spaghet.create_scope_map(None, ScopeType::Root);
 
     for decl in ast_root {
         match decl {
@@ -20,7 +20,7 @@ pub fn analyse_scope(ast_root: &TranslationUnit) -> Result<SpaghettiStack, Scope
             Decl::Fn(f) => {
                 insert_fn_to_scope(&mut spaghet, root_id, f)?;
                 let fn_table_id = generate_function_scope(&mut spaghet, root_id, f)?;
-                spaghet.add_child(root_id, fn_table_id);
+                spaghet.add_child(root_id, fn_table_id, Some(f.ident.clone()));
             }
         }
     }
@@ -35,11 +35,7 @@ fn generate_function_scope(
     parent_id: Id,
     fn_node: &FnDecl,
 ) -> Result<Id, ScopeError> {
-    let fn_table_id = spaghet.create_scope_map(
-        Some(parent_id),
-        ScopeType::FnBlock,
-        Some(fn_node.ident.clone()),
-    );
+    let fn_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::FnBlock);
 
     for param in fn_node.params.iter() {
         let sym_type = token_to_symtype(&param.type_tok, true);
@@ -65,13 +61,13 @@ fn analyse_block_scope(
         match stmt {
             Stmt::For(f) => {
                 let for_table_id = generate_for_scope(spaghet, curr_id, f)?;
-                spaghet.add_child(curr_id, for_table_id);
+                spaghet.add_child(curr_id, for_table_id, None);
             }
 
             Stmt::If(i) => {
                 let if_table_ids = generate_if_scope(spaghet, curr_id, i)?;
-                spaghet.add_child(curr_id, if_table_ids.0);
-                spaghet.add_child(curr_id, if_table_ids.1);
+                spaghet.add_child(curr_id, if_table_ids.0, None);
+                spaghet.add_child(curr_id, if_table_ids.1, None);
             }
 
             Stmt::Expr(es) | Stmt::Ret(es) => {
@@ -94,7 +90,7 @@ fn generate_for_scope(
     parent_id: Id,
     for_node: &ForStmt,
 ) -> Result<Id, ScopeError> {
-    let for_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::ForBlock, None);
+    let for_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::ForBlock);
 
     if for_node.init.is_some() {
         insert_var_to_scope(spaghet, for_table_id, for_node.init.as_ref().unwrap())?;
@@ -114,8 +110,8 @@ fn generate_if_scope(
     parent_id: Id,
     if_node: &IfStmt,
 ) -> Result<(Id, Id), ScopeError> {
-    let if_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock, None);
-    let else_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock, None);
+    let if_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock);
+    let else_table_id = spaghet.create_scope_map(Some(parent_id), ScopeType::IfBlock);
 
     // New variables can not be declared in this if's condition
     check_for_undeclared_ident(spaghet, parent_id, &if_node.cond)?;

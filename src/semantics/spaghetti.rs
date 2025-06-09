@@ -47,33 +47,34 @@ pub enum ScopeType {
 
 pub type Id = usize;
 
+#[derive(Debug, Clone)]
+struct ChildInfo {
+    id: Id,
+    name: Option<String>, // e.g for associating a function's name with a ScopeMap, within the
+                          // parent
+}
+
+impl ChildInfo {
+    pub fn new(id: Id, name: Option<String>) -> ChildInfo {
+        ChildInfo { id, name }
+    }
+}
+
 #[derive(Debug)]
 struct ScopeMap {
     scope_type: ScopeType,
-
     parent: Option<Id>,
-
-    children: Vec<Id>,
-
-    // NOTE: shitty solution to find a function's scope from just a name by
-    // performing a linear search. See:
-    // SpaghettiStack::get_fn_scope_id. A better (but arguably more
-    // invasive) approach could be to store it as part of the 'value' in
-    // the identifiers hashmap
-    scope_name: Option<String>,
-
+    children: Vec<ChildInfo>,
     symbols: HashMap<String, SymInfo>,
-
     param_types: Vec<SymType>, // In case this a is the scope of a function
 }
 
 impl ScopeMap {
-    fn new(parent_id: Option<Id>, scope_type: ScopeType, scope_name: Option<String>) -> ScopeMap {
+    fn new(parent_id: Option<Id>, scope_type: ScopeType) -> ScopeMap {
         ScopeMap {
             scope_type,
             parent: parent_id,
             children: vec![],
-            scope_name,
             symbols: HashMap::new(),
             param_types: vec![],
         }
@@ -86,8 +87,8 @@ impl ScopeMap {
         self.symbols.insert(ident.to_string(), sym_info);
     }
 
-    fn insert_child(&mut self, child_id: Id) {
-        self.children.push(child_id);
+    fn insert_child(&mut self, child_id: Id, scope_name: Option<String>) {
+        self.children.push(ChildInfo::new(child_id, scope_name));
     }
 
     fn get_param_types(&self) -> &Vec<SymType> {
@@ -112,15 +113,10 @@ impl SpaghettiStack {
         }
     }
 
-    pub fn create_scope_map(
-        &mut self,
-        parent_id: Option<Id>,
-        scope_type: ScopeType,
-        scope_name: Option<String>,
-    ) -> Id {
+    pub fn create_scope_map(&mut self, parent_id: Option<Id>, scope_type: ScopeType) -> Id {
         let id = self.descendants.len();
         self.descendants
-            .insert(id, ScopeMap::new(parent_id, scope_type, scope_name));
+            .insert(id, ScopeMap::new(parent_id, scope_type));
 
         id
     }
@@ -147,11 +143,11 @@ impl SpaghettiStack {
         scope_map.insert_val(ident, sym_info, is_param);
     }
 
-    pub fn add_child(&mut self, node_id: Id, child_id: Id) {
+    pub fn add_child(&mut self, node_id: Id, child_id: Id, child_scope_name: Option<String>) {
         self.descendants
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
-            .insert_child(child_id);
+            .insert_child(child_id, child_scope_name);
     }
 
     pub fn get_node_parent_id(&self, node_id: Id) -> Option<Id> {
@@ -178,19 +174,19 @@ impl SpaghettiStack {
         child_scope_type: ScopeType,
     ) -> Option<Id> {
         let mut ctr = 0;
-        for id in self
+        for child_info in self
             .descendants
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .children
             .iter()
         {
-            if child_scope_type == self.descendants.get(id).unwrap().scope_type {
+            if child_scope_type == self.descendants.get(&child_info.id).unwrap().scope_type {
                 ctr += 1;
             }
 
             if ctr == n {
-                return Some(*id);
+                return Some(child_info.id);
             }
         }
 
@@ -206,33 +202,17 @@ impl SpaghettiStack {
     }
 
     pub fn get_fn_param_types(&self, ident: &str) -> &Vec<SymType> {
-        self.descendants
-            .get(&self.get_fn_scope_id(ident))
-            .expect("id should point to valid ScopeMap")
-            .get_param_types()
-    }
-
-    fn get_fn_scope_id(&self, ident: &str) -> Id {
-        for c_idx in self
+        let child_id = self
             .descendants
             .get(&0)
             .expect("id should point to valid ScopeMap")
             .children
-            .clone()
-        {
-            if self
-                .descendants
-                .get(&c_idx)
-                .unwrap()
-                .scope_name
-                .clone()
-                .is_some_and(|fn_name| fn_name == ident)
-            {
-                return c_idx;
-            }
-        }
+            .iter()
+            .find(|&info| info.name.as_ref().is_some_and(|name| name == ident))
+            .expect("function being searched for doesn't exist")
+            .id;
 
-        unreachable!("function being searched for doesn't exist")
+        self.descendants.get(&child_id).unwrap().get_param_types()
     }
 }
 
