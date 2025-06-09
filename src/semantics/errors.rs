@@ -12,4 +12,5 @@ pub enum TypeChkError {
     ErroneousReturnType,
     ExpectedBooleanExpression,
     ErroneousBreak,
+    NonBooleanCondStmt,
 }

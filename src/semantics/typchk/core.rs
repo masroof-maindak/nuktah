@@ -83,7 +83,12 @@ fn check_block(
     for stmt in block {
         match stmt {
             Stmt::For(f) => {
-                // TODO: type-check `cond` (boolean) and `updt`
+                if get_expr_type(spaghet, &f.cond.expr, node_id)? != SymType::Bool {
+                    return Err(TypeChkError::NonBooleanCondStmt);
+                }
+
+                get_expr_type(spaghet, &f.updt, node_id)?;
+
                 ctr._for += 1;
                 let Some(for_child_id) =
                     spaghet.get_nth_child_of_type(node_id, ctr._for, ScopeType::ForBlock)
@@ -94,7 +99,9 @@ fn check_block(
             }
 
             Stmt::If(i) => {
-                // TODO: type-check `cond` (boolean)
+                if get_expr_type(spaghet, &i.cond, node_id)? != SymType::Bool {
+                    return Err(TypeChkError::NonBooleanCondStmt);
+                }
 
                 for block in [(&i.if_block), (&i.else_block)] {
                     ctr._if += 1;
@@ -119,7 +126,7 @@ fn check_block(
 
             Stmt::Break => {
                 // Iterate up to the top and check if we're in a for loop at any point in time
-                // TODO: add this as a method of SpaghettiStack
+                // TODO: Encapsulate this logic inside SpaghettiStack
                 let mut curr_id: Option<Id> = Some(node_id);
                 while curr_id.is_some() {
                     match spaghet.get_scope_type(curr_id.unwrap()) {
