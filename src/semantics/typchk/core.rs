@@ -143,7 +143,10 @@ fn check_block(
                 }
             }
 
-            Stmt::Expr(_) => {} // Empty expressions are kind of useless here
+            Stmt::Expr(e) => {
+                let _ = get_expr_type(spaghet, &e.expr, node_id)?;
+                return Ok(());
+            }
         }
     }
     Ok(())
