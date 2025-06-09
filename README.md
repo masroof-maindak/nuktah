@@ -55,7 +55,8 @@ cargo build -r
     - [x] Function definitions -> return type == token type
     - [x] Function to get id of nth scope-type child, of a given node
     - [x] Type-checking of for/if
-    - [ ] Recursive-descent expression chain
+    - [x] Recursive-descent expression chain
+    - [ ] Check arguments to functions
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [x] Add a boolean type

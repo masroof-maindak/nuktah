@@ -8,7 +8,7 @@ use std::fmt::Debug;
 // As we don't have structs at the moment, the former will suffice. Although I think it's possible
 // to make do w/ approach #1 in their presence too, but let's see.
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum SymType {
     Int,
     String,
@@ -26,6 +26,10 @@ pub struct SymInfo {
 impl SymInfo {
     pub fn is_var(&self) -> bool {
         self.is_var
+    }
+
+    pub fn get_type(&self) -> SymType {
+        self.sym_type
     }
 }
 

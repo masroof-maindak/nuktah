@@ -11,7 +11,14 @@ pub enum TypeChkError {
     ErroneousVarDecl,
     FunctionCallAndPrototypeMismatch,
     ErroneousReturnType,
+    ExpressionTypeMismatch,
     ExpectedBooleanExpression,
     ErroneousBreak,
     NonBooleanCondStmt,
+    EmptyExpression,
+    AttemptedBoolOpToNonBools,
+    AttemptedBitOpToNonNumeric,
+    AttemptedShiftOnNonInt,
+    AttemptedAddOpToNonNumeric,
+    AttemptedExponentianOfNonNumeric
 }
