@@ -64,7 +64,13 @@ fn check_var_decl(spaghet: &SpaghettiStack, v: &VarDecl, node_id: Id) -> Result<
 
 fn check_fn_decl(spaghet: &SpaghettiStack, f: &FnDecl, node_id: Id) -> Result<(), TypeChkError> {
     let ret_type = token_to_symtype(&f.type_tok, false);
-    check_block(spaghet, &f.block, &ret_type, node_id)?;
+    let mut ret_found = false;
+    check_block(spaghet, &f.block, &ret_type, node_id, &mut ret_found)?;
+
+    if !ret_found {
+        return Err(TypeChkError::ReturnStmtNotFound);
+    }
+
     Ok(())
 }
 
@@ -73,6 +79,7 @@ fn check_block(
     block: &Block,
     expected_ret_type: &SymType,
     node_id: Id,
+    ret_found: &mut bool,
 ) -> Result<(), TypeChkError> {
     let mut ctr = ScopeTypeCounter::new();
     for stmt in block {
@@ -85,12 +92,18 @@ fn check_block(
                     return Err(TypeChkError::NonBooleanCondStmt);
                 }
 
-                get_expr_type(spaghet, &f.updt, node_id)?;
+                let _ = get_expr_type(spaghet, &f.updt, node_id)?;
 
                 ctr._for += 1;
                 let for_child_id =
                     get_nth_child_of_type(spaghet, node_id, ctr._for, ScopeType::ForBlock);
-                check_block(spaghet, &f.block, expected_ret_type, for_child_id)?;
+                check_block(
+                    spaghet,
+                    &f.block,
+                    expected_ret_type,
+                    for_child_id,
+                    ret_found,
+                )?;
             }
 
             Stmt::If(i) => {
@@ -102,7 +115,7 @@ fn check_block(
                     ctr._if += 1;
                     let if_child_id =
                         get_nth_child_of_type(spaghet, node_id, ctr._if, ScopeType::IfBlock);
-                    check_block(spaghet, block, expected_ret_type, if_child_id)?;
+                    check_block(spaghet, block, expected_ret_type, if_child_id, ret_found)?;
                 }
             }
 
@@ -110,6 +123,8 @@ fn check_block(
                 if get_expr_type(spaghet, &r.expr, node_id)? != *expected_ret_type {
                     return Err(TypeChkError::ErroneousReturnType);
                 }
+
+                *ret_found = true;
             }
 
             Stmt::VarDecl(v) => check_var_decl(spaghet, v, node_id)?,
