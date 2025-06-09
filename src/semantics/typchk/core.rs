@@ -78,7 +78,10 @@ fn check_block(
     for stmt in block {
         match stmt {
             Stmt::For(f) => {
-                if get_expr_type(spaghet, &f.cond.expr, node_id)? != SymType::Bool {
+                if !matches!(
+                    get_expr_type(spaghet, &f.cond.expr, node_id)?,
+                    SymType::Bool | SymType::Void
+                ) {
                     return Err(TypeChkError::NonBooleanCondStmt);
                 }
 

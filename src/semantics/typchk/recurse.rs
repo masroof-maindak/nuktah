@@ -9,14 +9,13 @@ use crate::{
 };
 
 /// Get the type of the expression `expr`, encountered in node (ScopeMap) w/ Id `node_id`
-/// Assumes that the expression provided doesn't hold 'none'. It is the caller's job to ensure so.
 pub fn get_expr_type(
     spaghet: &SpaghettiStack,
     expr: &Expr,
     node_id: Id,
 ) -> Result<SymType, TypeChkError> {
     let Some(assign_expr) = expr else {
-        return Err(TypeChkError::EmptyExpression);
+        return Ok(SymType::Void);
     };
 
     match assign_expr {
@@ -49,7 +48,7 @@ fn get_bool_expr_type(
         BoolExpr::BitOr(bit_or_e) => get_bit_or_expr_type(spaghet, bit_or_e, node_id),
 
         BoolExpr::Bool(bool_e, _, bit_or_e) => {
-            if get_bool_expr_type(spaghet, &bool_e, node_id)? != SymType::Bool
+            if get_bool_expr_type(spaghet, bool_e, node_id)? != SymType::Bool
                 || get_bit_or_expr_type(spaghet, bit_or_e, node_id)? != SymType::Bool
             {
                 return Err(TypeChkError::AttemptedBoolOpToNonBools);
@@ -271,7 +270,7 @@ fn get_primary_expr_type(
             Ok(sym_info.get_type())
         }
 
-        PrimaryExpr::Paren(nested_e) => get_expr_type(spaghet, &nested_e, node_id),
+        PrimaryExpr::Paren(nested_e) => get_expr_type(spaghet, nested_e, node_id),
 
         PrimaryExpr::Call(fn_call) => get_fn_call_type(spaghet, fn_call, node_id),
 
@@ -310,7 +309,7 @@ fn get_fn_call_type(
 
 fn fetch_guaranteed_info_from_table(
     spaghet: &SpaghettiStack,
-    ident: &String,
+    ident: &str,
     node_id: Id,
     is_var: bool,
 ) -> SymInfo {
