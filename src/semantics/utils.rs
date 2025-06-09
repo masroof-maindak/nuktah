@@ -29,7 +29,6 @@ pub fn find_info_in_table(
     ident: &str,
     is_var: bool,
 ) -> Option<SymInfo> {
-    // TODO: Encapsulate this logic inside SpaghettiStack
     let mut curr_id: Option<Id> = Some(node_id);
 
     while curr_id.is_some() {

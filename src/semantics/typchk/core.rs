@@ -113,7 +113,6 @@ fn check_block(
 
             Stmt::Break => {
                 // Iterate up to the top and check if we're in a for loop at any point in time
-                // TODO: Encapsulate this logic inside SpaghettiStack
                 let mut curr_id: Option<Id> = Some(node_id);
                 while curr_id.is_some() {
                     match spaghet.get_scope_type(curr_id.unwrap()) {
