@@ -12,16 +12,16 @@ pub fn check_for_undeclared_ident(
     curr_id: Id,
     expr: &Expr,
 ) -> Result<(), ScopeError> {
-    let Some(assign_expr) = expr else {
+    let Some(assign_e) = expr else {
         return Ok(());
     };
 
-    match assign_expr {
-        AssignExpr::Bool(bool_expr) => check_bool_expr(spaghet, curr_id, bool_expr)?,
-        AssignExpr::Assign(bool_expr, nested_assign_expr) => {
-            check_bool_expr(spaghet, curr_id, bool_expr)?;
+    match assign_e {
+        AssignExpr::Bool(bool_e) => check_bool_expr(spaghet, curr_id, bool_e)?,
+        AssignExpr::Assign(bool_e, nested_a) => {
+            check_bool_expr(spaghet, curr_id, bool_e)?;
             // What the literal FUCK
-            let new_expr = &Some(nested_assign_expr.as_ref().clone());
+            let new_expr = &Some(nested_a.as_ref().clone());
             check_for_undeclared_ident(spaghet, curr_id, new_expr)?;
         }
     }
@@ -35,10 +35,10 @@ fn check_bool_expr(
     expr: &BoolExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        BoolExpr::BitOr(bit_or) => check_bit_or_expr(spaghet, curr_id, bit_or)?,
-        BoolExpr::Bool(bool_expr, _, bit_or) => {
-            check_bool_expr(spaghet, curr_id, bool_expr)?;
-            check_bit_or_expr(spaghet, curr_id, bit_or)?;
+        BoolExpr::BitOr(bit_or_e) => check_bit_or_expr(spaghet, curr_id, bit_or_e)?,
+        BoolExpr::Bool(bool_e, _, bit_or_e) => {
+            check_bool_expr(spaghet, curr_id, bool_e)?;
+            check_bit_or_expr(spaghet, curr_id, bit_or_e)?;
         }
     }
     Ok(())
@@ -50,10 +50,10 @@ fn check_bit_or_expr(
     expr: &BitOrExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        BitOrExpr::BitAnd(bit_and) => check_bit_and_expr(spaghet, curr_id, bit_and)?,
-        BitOrExpr::BitOr(bit_or, bit_and) => {
-            check_bit_or_expr(spaghet, curr_id, bit_or)?;
-            check_bit_and_expr(spaghet, curr_id, bit_and)?;
+        BitOrExpr::BitAnd(bit_and_e) => check_bit_and_expr(spaghet, curr_id, bit_and_e)?,
+        BitOrExpr::BitOr(bit_or_e, bit_and_e) => {
+            check_bit_or_expr(spaghet, curr_id, bit_or_e)?;
+            check_bit_and_expr(spaghet, curr_id, bit_and_e)?;
         }
     }
     Ok(())
@@ -65,10 +65,10 @@ fn check_bit_and_expr(
     expr: &BitAndExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        BitAndExpr::Comp(comp) => check_comp_expr(spaghet, curr_id, comp)?,
-        BitAndExpr::BitAnd(bit_and, comp) => {
-            check_bit_and_expr(spaghet, curr_id, bit_and)?;
-            check_comp_expr(spaghet, curr_id, comp)?;
+        BitAndExpr::Comp(comp_e) => check_comp_expr(spaghet, curr_id, comp_e)?,
+        BitAndExpr::BitAnd(bit_and_e, comp_e) => {
+            check_bit_and_expr(spaghet, curr_id, bit_and_e)?;
+            check_comp_expr(spaghet, curr_id, comp_e)?;
         }
     }
     Ok(())
@@ -80,10 +80,10 @@ fn check_comp_expr(
     expr: &CompExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        CompExpr::Shift(shift) => check_shift_expr(spaghet, curr_id, shift)?,
-        CompExpr::Comp(comp, _, shift) => {
-            check_comp_expr(spaghet, curr_id, comp)?;
-            check_shift_expr(spaghet, curr_id, shift)?;
+        CompExpr::Shift(shift_e) => check_shift_expr(spaghet, curr_id, shift_e)?,
+        CompExpr::Comp(comp_e, _, shift_e) => {
+            check_comp_expr(spaghet, curr_id, comp_e)?;
+            check_shift_expr(spaghet, curr_id, shift_e)?;
         }
     }
     Ok(())
@@ -95,10 +95,10 @@ fn check_shift_expr(
     expr: &ShiftExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        ShiftExpr::Add(add) => check_add_expr(spaghet, curr_id, add)?,
-        ShiftExpr::Shift(shift, _, add) => {
-            check_shift_expr(spaghet, curr_id, shift)?;
-            check_add_expr(spaghet, curr_id, add)?;
+        ShiftExpr::Add(add_e) => check_add_expr(spaghet, curr_id, add_e)?,
+        ShiftExpr::Shift(shift_e, _, add_e) => {
+            check_shift_expr(spaghet, curr_id, shift_e)?;
+            check_add_expr(spaghet, curr_id, add_e)?;
         }
     }
     Ok(())
@@ -107,9 +107,9 @@ fn check_shift_expr(
 fn check_add_expr(spaghet: &SpaghettiStack, curr_id: Id, expr: &AddExpr) -> Result<(), ScopeError> {
     match expr {
         AddExpr::Mul(mul) => check_mul_expr(spaghet, curr_id, mul)?,
-        AddExpr::Add(add, _, mul) => {
-            check_add_expr(spaghet, curr_id, add)?;
-            check_mul_expr(spaghet, curr_id, mul)?;
+        AddExpr::Add(add_e, _, mul_e) => {
+            check_add_expr(spaghet, curr_id, add_e)?;
+            check_mul_expr(spaghet, curr_id, mul_e)?;
         }
     }
     Ok(())
@@ -117,10 +117,10 @@ fn check_add_expr(spaghet: &SpaghettiStack, curr_id: Id, expr: &AddExpr) -> Resu
 
 fn check_mul_expr(spaghet: &SpaghettiStack, curr_id: Id, expr: &MulExpr) -> Result<(), ScopeError> {
     match expr {
-        MulExpr::Exp(exp) => check_exp_expr(spaghet, curr_id, exp)?,
-        MulExpr::Mul(mul, _, exp) => {
-            check_mul_expr(spaghet, curr_id, mul)?;
-            check_exp_expr(spaghet, curr_id, exp)?;
+        MulExpr::Exp(exp_e) => check_exp_expr(spaghet, curr_id, exp_e)?,
+        MulExpr::Mul(mul_e, _, exp_e) => {
+            check_mul_expr(spaghet, curr_id, mul_e)?;
+            check_exp_expr(spaghet, curr_id, exp_e)?;
         }
     }
     Ok(())
@@ -128,10 +128,10 @@ fn check_mul_expr(spaghet: &SpaghettiStack, curr_id: Id, expr: &MulExpr) -> Resu
 
 fn check_exp_expr(spaghet: &SpaghettiStack, curr_id: Id, expr: &ExpExpr) -> Result<(), ScopeError> {
     match expr {
-        ExpExpr::Unary(unary) => check_unary_expr(spaghet, curr_id, unary)?,
-        ExpExpr::Exp(unary, exp) => {
-            check_unary_expr(spaghet, curr_id, unary)?;
-            check_exp_expr(spaghet, curr_id, exp)?;
+        ExpExpr::Unary(unary_e) => check_unary_expr(spaghet, curr_id, unary_e)?,
+        ExpExpr::Exp(unary_e, exp_e) => {
+            check_unary_expr(spaghet, curr_id, unary_e)?;
+            check_exp_expr(spaghet, curr_id, exp_e)?;
         }
     }
     Ok(())
@@ -143,8 +143,8 @@ fn check_unary_expr(
     expr: &UnaryExpr,
 ) -> Result<(), ScopeError> {
     match expr {
-        UnaryExpr::Primary(primary) => check_primary_expr(spaghet, curr_id, primary)?,
-        UnaryExpr::Unary(_, unary) => check_unary_expr(spaghet, curr_id, unary)?,
+        UnaryExpr::Primary(primary_e) => check_primary_expr(spaghet, curr_id, primary_e)?,
+        UnaryExpr::Unary(_, unary_e) => check_unary_expr(spaghet, curr_id, unary_e)?,
     }
     Ok(())
 }
@@ -157,17 +157,15 @@ fn check_primary_expr(
     match expr {
         PrimaryExpr::Ident(ident) => {
             if find_info_in_table(spaghet, curr_id, ident, true).is_none() {
-                return Err(ScopeError::UndefinedIdentifierUsed);
+                return Err(ScopeError::UndeclaredVariableCalled);
             }
         }
 
-        PrimaryExpr::Paren(nested_expr) => {
-            check_for_undeclared_ident(spaghet, curr_id, nested_expr)?
-        }
+        PrimaryExpr::Paren(nested_e) => check_for_undeclared_ident(spaghet, curr_id, nested_e)?,
 
         PrimaryExpr::Call(fn_call) => {
             if find_info_in_table(spaghet, curr_id, &fn_call.ident, false).is_none() {
-                return Err(ScopeError::UndefinedIdentifierUsed);
+                return Err(ScopeError::UndefinedFunctionCalled);
             }
 
             // Check all arguments
@@ -182,5 +180,6 @@ fn check_primary_expr(
         | PrimaryExpr::StringLit(_)
         | PrimaryExpr::BoolLit(_) => {}
     }
+
     Ok(())
 }
