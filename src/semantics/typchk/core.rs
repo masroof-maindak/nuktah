@@ -41,13 +41,8 @@ pub fn check_types(
 
             Decl::Fn(f) => {
                 ctr._fn += 1;
-
-                let Some(node_id) =
-                    symbol_table.get_nth_child_of_type(ROOT_ID, ctr._fn, ScopeType::FnBlock)
-                else {
-                    unreachable!("couldn't find fn #{} in the root scope", ctr._fn)
-                };
-
+                let node_id =
+                    get_nth_child_of_type(symbol_table, ROOT_ID, ctr._fn, ScopeType::FnBlock);
                 check_fn_decl(symbol_table, f, node_id)?;
             }
         }
@@ -90,11 +85,8 @@ fn check_block(
                 get_expr_type(spaghet, &f.updt, node_id)?;
 
                 ctr._for += 1;
-                let Some(for_child_id) =
-                    spaghet.get_nth_child_of_type(node_id, ctr._for, ScopeType::ForBlock)
-                else {
-                    unreachable!("couldn't find for #{} in scope #{}", ctr._for, node_id)
-                };
+                let for_child_id =
+                    get_nth_child_of_type(spaghet, node_id, ctr._for, ScopeType::ForBlock);
                 check_block(spaghet, &f.block, expected_ret_type, for_child_id)?;
             }
 
@@ -105,13 +97,8 @@ fn check_block(
 
                 for block in [(&i.if_block), (&i.else_block)] {
                     ctr._if += 1;
-
-                    let Some(if_child_id) =
-                        spaghet.get_nth_child_of_type(node_id, ctr._if, ScopeType::IfBlock)
-                    else {
-                        unreachable!("couldn't find if block #{} in scope #{}", ctr._if, node_id)
-                    };
-
+                    let if_child_id =
+                        get_nth_child_of_type(spaghet, node_id, ctr._if, ScopeType::IfBlock);
                     check_block(spaghet, block, expected_ret_type, if_child_id)?;
                 }
             }
@@ -141,4 +128,17 @@ fn check_block(
         }
     }
     Ok(())
+}
+
+fn get_nth_child_of_type(
+    symbol_table: &SpaghettiStack,
+    node_id: Id,
+    ctr: usize,
+    scope_type: ScopeType,
+) -> Id {
+    let Some(node_id) = symbol_table.get_nth_child_of_type(node_id, ctr, scope_type.clone()) else {
+        unreachable!("couldn't find {:?} #{} in the root scope", scope_type, ctr)
+    };
+
+    node_id
 }
