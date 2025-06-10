@@ -55,8 +55,6 @@ fn check_var_decl(spaghet: &SpaghettiStack, v: &VarDecl, node_id: Id) -> Result<
     let expr_type = get_expr_type(spaghet, &v.expr, node_id)?;
     let var_type = token_to_symtype(&v.type_tok, true);
 
-    println!("{:?} -- {:?}", expr_type, var_type);
-
     if var_type != expr_type {
         return Err(TypeChkError::ErroneousVarDecl);
     }
