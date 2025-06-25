@@ -17,10 +17,10 @@ pub enum TypeChkError {
     ErroneousBreak,
     NonBooleanCondStmt,
     EmptyExpression,
-    AttemptedBoolOpToNonBools,
-    AttemptedBitOpToNonNumeric,
+    AttemptedBoolOpOnNonBools,
+    AttemptedBitOpOnNonNumeric,
     AttemptedShiftOnNonInt,
-    AttemptedAddOpToNonNumeric,
+    AttemptedAddOpOnNonNumeric,
     AttemptedExponentianOfNonNumeric,
     ReturnStmtNotFound,
 }

@@ -51,7 +51,7 @@ fn get_bool_expr_type(
             if get_bool_expr_type(spaghet, bool_e, node_id)? != SymType::Bool
                 || get_bit_or_expr_type(spaghet, bit_or_e, node_id)? != SymType::Bool
             {
-                return Err(TypeChkError::AttemptedBoolOpToNonBools);
+                return Err(TypeChkError::AttemptedBoolOpOnNonBools);
             }
 
             Ok(SymType::Bool)
@@ -75,7 +75,7 @@ fn get_bit_or_expr_type(
             }
 
             if ![SymType::Int, SymType::Float].contains(&lhs_type) {
-                return Err(TypeChkError::AttemptedBitOpToNonNumeric);
+                return Err(TypeChkError::AttemptedBitOpOnNonNumeric);
             }
 
             Ok(lhs_type)
@@ -99,7 +99,7 @@ fn get_bit_and_expr_type(
             }
 
             if ![SymType::Int, SymType::Float].contains(&lhs_type) {
-                return Err(TypeChkError::AttemptedBitOpToNonNumeric);
+                return Err(TypeChkError::AttemptedBitOpOnNonNumeric);
             }
 
             Ok(lhs_type)
@@ -143,7 +143,7 @@ fn get_shift_expr_type(
                 return Err(TypeChkError::ExpressionTypeMismatch);
             }
 
-            if ![SymType::Int].contains(&lhs_type) {
+            if lhs_type != SymType::Int {
                 return Err(TypeChkError::AttemptedShiftOnNonInt);
             }
 
@@ -168,7 +168,7 @@ fn get_add_expr_type(
             }
 
             if ![SymType::Int, SymType::Float].contains(&lhs_type) {
-                return Err(TypeChkError::AttemptedAddOpToNonNumeric);
+                return Err(TypeChkError::AttemptedAddOpOnNonNumeric);
             }
 
             Ok(lhs_type)
@@ -192,7 +192,7 @@ fn get_mul_expr_type(
             }
 
             if ![SymType::Int, SymType::Float].contains(&lhs_type) {
-                return Err(TypeChkError::AttemptedBitOpToNonNumeric);
+                return Err(TypeChkError::AttemptedBitOpOnNonNumeric);
             }
 
             Ok(lhs_type)
@@ -224,7 +224,6 @@ fn get_exp_expr_type(
     }
 }
 
-//unary to primary
 fn get_unary_expr_type(
     spaghet: &SpaghettiStack,
     expr: &UnaryExpr,
@@ -239,13 +238,13 @@ fn get_unary_expr_type(
             match tok {
                 Token::SubOp => {
                     if ![SymType::Int, SymType::Float].contains(&primary_e_type) {
-                        return Err(TypeChkError::AttemptedAddOpToNonNumeric);
+                        return Err(TypeChkError::AttemptedAddOpOnNonNumeric);
                     }
                 }
 
                 Token::BooleanNot | Token::BitwiseNot => {
                     if primary_e_type != SymType::Bool {
-                        return Err(TypeChkError::AttemptedBitOpToNonNumeric);
+                        return Err(TypeChkError::AttemptedBitOpOnNonNumeric);
                     }
                 }
 
@@ -293,7 +292,7 @@ fn get_fn_call_type(
 
     for (i, arg) in fn_call.args.iter().enumerate() {
         if arg.is_none() {
-            unreachable!("argument to function is None");
+            unreachable!("argument to function is of type None");
         }
 
         if get_expr_type(spaghet, arg, node_id)? != param_types[i] {
