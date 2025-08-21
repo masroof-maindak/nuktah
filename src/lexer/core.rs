@@ -16,7 +16,7 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
 
     while idx < src.len() {
         let word = strtok(src, DELIM, &mut idx);
-        let mut t = identify_token(word, quotes_started)?;
+        let mut t = identify_token(word, quotes_started, comment_started)?;
 
         // if comment started, ignore all tokens until newline
         if comment_started {
@@ -31,7 +31,9 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
             continue;
         }
 
-        consolidate_tokens(&mut token_list, &mut t, quotes_started);
+        if !token_list.is_empty() {
+            consolidate_tokens(&mut token_list, &mut t, quotes_started);
+        }
 
         if t == Token::Quotes {
             quotes_started = !quotes_started;
@@ -47,7 +49,8 @@ pub fn tokenize_src_code(src: &str) -> Result<Vec<Token>, LexerError> {
 fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
     let remaining_text = &src[*idx..];
 
-    let first_char = remaining_text.chars().next().unwrap(); // guaranteed to be non-empty
+    let first_char = remaining_text.chars().next().unwrap();
+
     if delims.contains(first_char) {
         *idx += first_char.len_utf8();
         return &remaining_text[0..first_char.len_utf8()];
@@ -63,7 +66,11 @@ fn strtok<'a>(src: &'a str, delims: &str, idx: &mut usize) -> &'a str {
     &remaining_text[..byte_count]
 }
 
-fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError> {
+fn identify_token(
+    word: &str,
+    quotes_started: bool,
+    comment_started: bool,
+) -> Result<Token, LexerError> {
     if word == "\"" {
         return Ok(Token::Quotes);
     }
@@ -124,18 +131,24 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
         ">" => Ok(Token::GreaterThan),
 
         _ => {
+            // No need to attempt to verify
+            if comment_started {
+                return Ok(Token::Identifier(word.to_string()));
+            }
+
             // Int
             if let Ok(n) = word.parse::<i64>() {
                 return Ok(Token::IntLit(n));
             }
 
             // Identifier
-            // Start with a letter or underscore
+
+            // Starts with a letter or underscore
             if !word.starts_with(|c: char| c.is_alphabetic() || c == '_') {
                 return Err(LexerError::InvalidIdentifier(word.to_string()));
             }
 
-            // word should only contain letters, numbers, and underscores
+            // Contains letters, numbers, and underscores
             if !word.chars().all(|c| c.is_alphanumeric() || c == '_') {
                 return Err(LexerError::InvalidIdentifier(word.to_string()));
             }
@@ -146,27 +159,11 @@ fn identify_token(word: &str, quotes_started: bool) -> Result<Token, LexerError>
 }
 
 fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quotes_started: bool) {
-    if token_list.is_empty()
-        // TODO: we can probably safely remove this match
-        || !matches!(
-            curr_token,
-                Token::AssignOp
-                | Token::Whitespace
-                | Token::Quotes
-                | Token::LessThan
-                | Token::GreaterThan
-                | Token::BitwiseAnd
-                | Token::BitwiseOr
-                | Token::StringLit(_)
-                | Token::IntLit(_)
-        )
-    {
-        return;
-    }
-
     let last_token = token_list.last().unwrap();
 
-    // If the last token is a string literal
+    // This has got to be some of the nastiest shit I've ever written...
+
+    // Combine string literals
     if let Token::StringLit(last_str) = last_token.clone() {
         // if the current token is a string literal, combine them
         if let Token::StringLit(curr_str) = curr_token {
@@ -183,6 +180,7 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
         }
     }
 
+    // Form float literal from two integers and decimal
     if let [.., Token::IntLit(int_part), Token::Dot] = token_list[..] {
         if let Token::IntLit(frac_part) = *curr_token {
             token_list.pop();
@@ -194,7 +192,18 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
     }
 
     // `==, <<, >>, &&, ||` from `=, <, >, &, |`
-    if *last_token == *curr_token {
+    if *last_token == *curr_token
+        && matches!(
+            curr_token,
+            Token::AssignOp
+                | Token::Whitespace
+                | Token::Quotes
+                | Token::LessThan
+                | Token::GreaterThan
+                | Token::BitwiseAnd
+                | Token::BitwiseOr
+        )
+    {
         //  qs - !ws => POP
         // !qs - !ws => POP
         // !qs -  ws => POP

@@ -12,4 +12,6 @@ $ Types
 ginti asharia jumla khali
 
 $ Operators
-+ - * / % ^ (exponentiation!) & | ~ ! = == != < > <= >= && ||
++ - * / % ^ (exponentiation!) & | ~ ! = == < > && ||
+
+$ CHECK: Add `<=`, `>=` and `!=` some day?
