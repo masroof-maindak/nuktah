@@ -310,7 +310,7 @@ fn fetch_guaranteed_info_from_table(
     is_var: bool,
 ) -> SymInfo {
     let Some(info) = find_info_in_table(spaghet, node_id, ident, is_var) else {
-        unreachable!("identifier doesn't exist in symbol table");
+        unreachable!("identifier `{}` doesn't exist in symbol table", ident);
     };
 
     info
