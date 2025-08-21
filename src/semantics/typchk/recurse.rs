@@ -216,7 +216,7 @@ fn get_exp_expr_type(
             }
 
             if ![SymType::Int, SymType::Float].contains(&lhs_type) {
-                return Err(TypeChkError::AttemptedExponentianOfNonNumeric);
+                return Err(TypeChkError::AttemptedExponentiationOfNonNumeric);
             }
 
             Ok(lhs_type)

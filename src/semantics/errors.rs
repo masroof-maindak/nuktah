@@ -21,6 +21,6 @@ pub enum TypeChkError {
     AttemptedBitOpOnNonNumeric,
     AttemptedShiftOnNonInt,
     AttemptedAddOpOnNonNumeric,
-    AttemptedExponentianOfNonNumeric,
+    AttemptedExponentiationOfNonNumeric,
     ReturnStmtNotFound,
 }
