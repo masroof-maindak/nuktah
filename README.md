@@ -17,7 +17,7 @@ fn ginti some_fn() {
 ## Installation & Usage
 
 - The shrimplest way to get up and running with the Nuktah compiler is downloading an automatically generated release (x86_64 Linux only)
-- Ensure you have [`cargo` and `rust`](https://www.rust-lang.org/tools/install) (build dependencies) installed and added to your $PATH
+- To build locally, ensure you have [`cargo` and `rust`](https://www.rust-lang.org/tools/install) installed and added to your $PATH
 
 ```bash
 git clone https://github.com/masroof-maindak/nuktah.git
@@ -73,6 +73,7 @@ cargo build -r
 
 #### Parsing
 
+- [Compiler Construction - Niklaus Wirth (Chapter #4.1)](https://people.inf.ethz.ch/wirth/CompilerConstruction/CompilerConstruction1.pdf)
 - The Dragon Book
 - [C's grammar](https://cs.wmich.edu/~gupta/teaching/cs4850/sumII06/The%20syntax%20of%20C%20in%20Backus-Naur%20form.htm)
 - [Simple but Powerful Pratt Parsing - Matklad](https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html)
