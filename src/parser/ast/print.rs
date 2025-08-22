@@ -3,8 +3,6 @@ use std::fmt;
 use crate::lexer::Token;
 use crate::parser::ast::core::*;
 
-// TODO(ast/print): Use Macros or some shit and burn this entire file
-
 impl AssignExpr {
     fn fmt_with_indent(
         &self,

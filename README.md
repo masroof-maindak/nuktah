@@ -60,12 +60,12 @@ cargo build -r
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [x] Add a boolean type
-- [ ] `ir_gen`
 - [ ] Eliminate `mod.rs` files
 - [ ] Unit tests
+- [ ] `ir_gen`
+- [ ] `asm_gen` -> ARM? MIPS?
 - [ ] Arrays
 - [ ] Structs
-- [ ] `asm_gen` -> ARM?
 - [ ] Rewrite expression printing rules (for the AST) w/ macros
 - [ ] Eliminate Rust anti-pattern: String cloning w.r.t `Token::StringLit`
 
