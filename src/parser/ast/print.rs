@@ -13,7 +13,7 @@ impl AssignExpr {
         match self {
             AssignExpr::Bool(e) => e.fmt_with_indent(f, indent),
             AssignExpr::Assign(lhs, rhs) => {
-                write!(f, "\n{}Assign({:#?})", indent_str, Token::AssignOp)?;
+                write!(f, "\n{indent_str}Assign({:#?})", Token::AssignOp)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
                 write!(f, "\n{indent_str})")
@@ -51,7 +51,7 @@ impl BitOrExpr {
         match self {
             BitOrExpr::BitAnd(e) => e.fmt_with_indent(f, indent),
             BitOrExpr::BitOr(lhs, rhs) => {
-                write!(f, "\n{}BitOr({:#?})", indent_str, Token::BitwiseOr)?;
+                write!(f, "\n{indent_str}BitOr({:#?})", Token::BitwiseOr)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
                 write!(f, "\n{indent_str})")
@@ -70,7 +70,7 @@ impl BitAndExpr {
         match self {
             BitAndExpr::Comp(e) => e.fmt_with_indent(f, indent),
             BitAndExpr::BitAnd(lhs, rhs) => {
-                write!(f, "\n{}BitAnd({:#?})", indent_str, Token::BitwiseAnd)?;
+                write!(f, "\n{indent_str}BitAnd({:#?})", Token::BitwiseAnd)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
                 write!(f, "\n{indent_str})")
@@ -167,7 +167,7 @@ impl ExpExpr {
         match self {
             ExpExpr::Unary(e) => e.fmt_with_indent(f, indent),
             ExpExpr::Exp(lhs, rhs) => {
-                write!(f, "\n{}Exp({:#?})", indent_str, Token::ExpOp)?;
+                write!(f, "\n{indent_str}Exp({:#?})", Token::ExpOp)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
                 write!(f, "\n{indent_str})")

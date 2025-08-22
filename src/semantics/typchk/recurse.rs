@@ -65,7 +65,7 @@ fn get_bit_or_expr_type(
     node_id: Id,
 ) -> Result<SymType, TypeChkError> {
     match expr {
-        BitOrExpr::BitAnd(ba) => get_bit_and_expr_type(spaghet, ba, node_id),
+        BitOrExpr::BitAnd(bit_and_e) => get_bit_and_expr_type(spaghet, bit_and_e, node_id),
         BitOrExpr::BitOr(bit_or_e, bit_and_e) => {
             let lhs_type = get_bit_and_expr_type(spaghet, bit_and_e, node_id)?;
             let rhs_type = get_bit_or_expr_type(spaghet, bit_or_e, node_id)?;
@@ -248,10 +248,7 @@ fn get_unary_expr_type(
                     }
                 }
 
-                _ => unreachable!(
-                    "unexpected operation's token in unary expression: {:?}",
-                    tok
-                ),
+                _ => unreachable!("unexpected operation's token in unary expression: {tok:?}"),
             }
 
             Ok(primary_e_type)
@@ -310,7 +307,7 @@ fn fetch_guaranteed_info_from_table(
     is_var: bool,
 ) -> SymInfo {
     let Some(info) = find_info_in_table(spaghet, node_id, ident, is_var) else {
-        unreachable!("identifier `{}` doesn't exist in symbol table", ident);
+        unreachable!("identifier `{ident}` doesn't exist in symbol table");
     };
 
     info
