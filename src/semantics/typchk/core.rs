@@ -85,18 +85,20 @@ fn check_block(
     for stmt in block {
         match stmt {
             Stmt::For(f) => {
+                ctr._for += 1;
+
+                let for_child_id =
+                    get_nth_child_of_type(spaghet, node_id, ctr._for, ScopeType::ForBlock);
+
                 if !matches!(
-                    get_expr_type(spaghet, &f.cond.expr, node_id)?,
+                    get_expr_type(spaghet, &f.cond.expr, for_child_id)?,
                     SymType::Bool | SymType::Void
                 ) {
                     return Err(TypeChkError::NonBooleanCondStmt);
                 }
 
-                let _ = get_expr_type(spaghet, &f.updt, node_id)?;
+                let _ = get_expr_type(spaghet, &f.updt, for_child_id)?;
 
-                ctr._for += 1;
-                let for_child_id =
-                    get_nth_child_of_type(spaghet, node_id, ctr._for, ScopeType::ForBlock);
                 check_block(
                     spaghet,
                     &f.block,
@@ -113,8 +115,10 @@ fn check_block(
 
                 for block in [(&i.if_block), (&i.else_block)] {
                     ctr._if += 1;
+
                     let if_child_id =
                         get_nth_child_of_type(spaghet, node_id, ctr._if, ScopeType::IfBlock);
+
                     check_block(spaghet, block, expected_ret_type, if_child_id, ret_found)?;
                 }
             }
