@@ -22,7 +22,7 @@ pub fn compile_src(src_code: &str) -> Result<(), CompilerError> {
     // println!("AST:\n{:#?}\n", ast_root);
 
     let sym_table = semantics::core::analyse_semantics(&ast_root)?;
-    println!("Symbol Table:\n{:#?}\n", sym_table);
+    println!("Symbol Table:\n{sym_table:#?}\n");
 
     Ok(())
 }

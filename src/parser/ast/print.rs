@@ -16,7 +16,7 @@ impl AssignExpr {
                 write!(f, "\n{}Assign({:#?})", indent_str, Token::AssignOp)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -32,10 +32,10 @@ impl BoolExpr {
         match self {
             BoolExpr::BitOr(e) => e.fmt_with_indent(f, indent),
             BoolExpr::Bool(lhs, op, rhs) => {
-                write!(f, "\n{}Bool({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}Bool({op:#?})")?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -54,7 +54,7 @@ impl BitOrExpr {
                 write!(f, "\n{}BitOr({:#?})", indent_str, Token::BitwiseOr)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -73,7 +73,7 @@ impl BitAndExpr {
                 write!(f, "\n{}BitAnd({:#?})", indent_str, Token::BitwiseAnd)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -89,10 +89,10 @@ impl CompExpr {
         match self {
             CompExpr::Shift(e) => e.fmt_with_indent(f, indent),
             CompExpr::Comp(lhs, op, rhs) => {
-                write!(f, "\n{}Comp({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}Comp({op:#?})")?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -108,10 +108,10 @@ impl ShiftExpr {
         match self {
             ShiftExpr::Add(e) => e.fmt_with_indent(f, indent),
             ShiftExpr::Shift(lhs, op, rhs) => {
-                write!(f, "\n{}Shift({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}Shift({op:#?})")?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -128,10 +128,10 @@ impl AddExpr {
         match self {
             AddExpr::Mul(e) => e.fmt_with_indent(f, indent),
             AddExpr::Add(lhs, op, rhs) => {
-                write!(f, "\n{}::Add({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}::Add({op:#?})")?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -148,10 +148,10 @@ impl MulExpr {
         match self {
             MulExpr::Exp(e) => e.fmt_with_indent(f, indent),
             MulExpr::Mul(lhs, op, rhs) => {
-                write!(f, "\n{}::Mul({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}::Mul({op:#?})")?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -170,7 +170,7 @@ impl ExpExpr {
                 write!(f, "\n{}Exp({:#?})", indent_str, Token::ExpOp)?;
                 lhs.fmt_with_indent(f, indent + 1)?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -186,9 +186,9 @@ impl UnaryExpr {
         match self {
             UnaryExpr::Primary(e) => e.fmt_with_indent(f, indent),
             UnaryExpr::Unary(op, rhs) => {
-                write!(f, "\n{}Unary({:#?})", indent_str, op)?;
+                write!(f, "\n{indent_str}Unary({op:#?})")?;
                 rhs.fmt_with_indent(f, indent + 1)?;
-                write!(f, "\n{})", indent_str)
+                write!(f, "\n{indent_str})")
             }
         }
     }
@@ -202,7 +202,7 @@ fn fmt_option_assign_expr(
     let indent_str = " ".repeat(indent * 4);
     match expr {
         Some(e) => e.fmt_with_indent(f, indent),
-        None => write!(f, "\n{}<empty>", indent_str),
+        None => write!(f, "\n{indent_str}<empty>"),
     }
 }
 
@@ -214,14 +214,14 @@ impl PrimaryExpr {
     ) -> Result<(), std::fmt::Error> {
         let indent_str = " ".repeat(indent * 4);
         match self {
-            PrimaryExpr::IntLit(e) => write!(f, "\n{}{:?}", indent_str, e),
-            PrimaryExpr::FloatLit(e) => write!(f, "\n{}{:?}", indent_str, e),
-            PrimaryExpr::StringLit(e) => write!(f, "\n{}{:?}", indent_str, e),
-            PrimaryExpr::BoolLit(e) => write!(f, "\n{}{:?}", indent_str, e),
-            PrimaryExpr::Ident(e) => write!(f, "\n{}{:?}", indent_str, e),
+            PrimaryExpr::IntLit(e) => write!(f, "\n{indent_str}{e:?}"),
+            PrimaryExpr::FloatLit(e) => write!(f, "\n{indent_str}{e:?}"),
+            PrimaryExpr::StringLit(e) => write!(f, "\n{indent_str}{e:?}"),
+            PrimaryExpr::BoolLit(e) => write!(f, "\n{indent_str}{e:?}"),
+            PrimaryExpr::Ident(e) => write!(f, "\n{indent_str}{e:?}"),
             PrimaryExpr::Paren(e) => fmt_option_assign_expr(e, f, indent + 1),
             PrimaryExpr::Call(fn_call) => {
-                write!(f, "\n{}Call({:#?})", indent_str, fn_call)
+                write!(f, "\n{indent_str}Call({fn_call:#?})")
             }
         }
     }

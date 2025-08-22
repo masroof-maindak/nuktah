@@ -185,7 +185,7 @@ fn consolidate_tokens(token_list: &mut Vec<Token>, curr_token: &mut Token, quote
         if let Token::IntLit(frac_part) = *curr_token {
             token_list.pop();
             token_list.pop();
-            let f = format!("{}.{}", int_part, frac_part);
+            let f = format!("{int_part}.{frac_part}");
             *curr_token = Token::FloatLit(f.parse::<f64>().unwrap());
             return;
         }
