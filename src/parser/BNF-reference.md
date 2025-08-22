@@ -23,7 +23,7 @@
 **cond**             -> expr-stmt<br>
 **updt**             -> expr | EPSILON
 
-**if-stmt**          -> T\_IF • T\_PAREN\_L • expr • T\_PAREN\_R • block • T\_ELSE • block // (mandatory else!)<br>
+**if-stmt**          -> T\_IF • T\_PAREN\_L • expr • T\_PAREN\_R • block • T\_ELSE • block // (mandatory else!)
 
 **ret-stmt**         -> T\_RET • expr-stmt
 
@@ -57,7 +57,7 @@
 **unary-expr**       -> primary | unary-op • unary-expr<br>
 **unary-op**         -> T\_SUBOP | T\_BOOLEANOT | T\_BITWISENOT
 
-**primary**          -> T\_INTLIT | T\_FLOATLIT | T\_STRINGLIT | bool-lit | T\_IDENTIFIER | T\_PAREN\_L • expr • T\_PAREN\_R | fn-call
+**primary**          -> T\_INTLIT | T\_FLOATLIT | T\_STRINGLIT | bool-lit | T\_IDENTIFIER | T\_PAREN\_L • expr • T\_PAREN\_R | fn-call<br>
 **bool-lit**         -> T\_TRUELIT |T\_FALSELIT
 
 **fn-call**          -> T\_IDENTIFIER • T\_PAREN\_L • fn-args • T\_PAREN\_R<br>
