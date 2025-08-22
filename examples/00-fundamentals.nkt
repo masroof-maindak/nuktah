@@ -14,4 +14,4 @@ ginti asharia jumla khali
 $ Operators
 + - * / % ^ (exponentiation!) & | ~ ! = == < > && ||
 
-$ CHECK: Add `<=`, `>=` and `!=` some day?
+$ CHECK(boolean op tokens): Add `<=`, `>=` and `!=` some day?

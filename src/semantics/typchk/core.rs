@@ -147,7 +147,7 @@ fn check_block(
 
             Stmt::Expr(e) => {
                 let _ = get_expr_type(spaghet, &e.expr, node_id)?;
-                return Ok(());
+                return Ok(()); // CHECK(unnecessary/incorrect ret): I don't think this should be here...?
             }
         }
     }
