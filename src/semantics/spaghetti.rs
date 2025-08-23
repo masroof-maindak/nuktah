@@ -62,11 +62,11 @@ impl ChildInfo {
 
 #[derive(Debug)]
 struct ScopeMap {
-    scope_type: ScopeType,
-    parent: Option<Id>,
-    children: Vec<ChildInfo>,
-    symbols: HashMap<String, SymInfo>,
-    param_types: Vec<SymType>, // In case this a is the scope of a function
+    scope_type: ScopeType,             // Root/Function/For/If Block
+    parent: Option<Id>,                // Parent scope ID
+    children: Vec<ChildInfo>,          // Info of child scopes
+    symbols: HashMap<String, SymInfo>, // Maps identifiers to their info
+    param_types: Vec<SymType>,         // In case this is the scope of a function
 }
 
 impl ScopeMap {
@@ -102,21 +102,19 @@ impl ScopeMap {
 /// use-case because there is no chance of any disassociation b/w an Id and a reference to a node
 /// (as we won't be removing any nodes at all)
 pub struct SpaghettiStack {
-    // root: Id,
-    descendants: BTreeMap<Id, ScopeMap>,
+    scopes: BTreeMap<Id, ScopeMap>,
 }
 
 impl SpaghettiStack {
     pub fn new() -> SpaghettiStack {
         SpaghettiStack {
-            descendants: BTreeMap::new(),
+            scopes: BTreeMap::new(),
         }
     }
 
     pub fn create_scope_map(&mut self, parent_id: Option<Id>, scope_type: ScopeType) -> Id {
-        let id = self.descendants.len();
-        self.descendants
-            .insert(id, ScopeMap::new(parent_id, scope_type));
+        let id = self.scopes.len();
+        self.scopes.insert(id, ScopeMap::new(parent_id, scope_type));
 
         id
     }
@@ -129,7 +127,7 @@ impl SpaghettiStack {
         is_param: bool,
     ) {
         let scope_map = self
-            .descendants
+            .scopes
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap");
 
@@ -144,21 +142,21 @@ impl SpaghettiStack {
     }
 
     pub fn add_child(&mut self, node_id: Id, child_id: Id, child_scope_name: Option<String>) {
-        self.descendants
+        self.scopes
             .get_mut(&node_id)
             .expect("id should point to valid ScopeMap")
             .insert_child(child_id, child_scope_name);
     }
 
     pub fn get_node_parent_id(&self, node_id: Id) -> Option<Id> {
-        self.descendants
+        self.scopes
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .parent
     }
 
     pub fn get_ident_info(&self, node_id: Id, ident: &str) -> Option<&SymInfo> {
-        self.descendants
+        self.scopes
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .symbols
@@ -175,13 +173,13 @@ impl SpaghettiStack {
     ) -> Option<Id> {
         let mut ctr = 0;
         for child_info in self
-            .descendants
+            .scopes
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .children
             .iter()
         {
-            if child_scope_type == self.descendants.get(&child_info.id).unwrap().scope_type {
+            if child_scope_type == self.scopes.get(&child_info.id).unwrap().scope_type {
                 ctr += 1;
             }
 
@@ -194,7 +192,7 @@ impl SpaghettiStack {
     }
 
     pub fn get_scope_type(&self, node_id: Id) -> ScopeType {
-        self.descendants
+        self.scopes
             .get(&node_id)
             .expect("id should point to valid ScopeMap")
             .scope_type
@@ -203,7 +201,7 @@ impl SpaghettiStack {
 
     pub fn get_fn_param_types(&self, ident: &str) -> &Vec<SymType> {
         let child_id = self
-            .descendants
+            .scopes
             .get(&0)
             .expect("id should point to valid ScopeMap")
             .children
@@ -212,7 +210,7 @@ impl SpaghettiStack {
             .expect("function being searched for doesn't exist")
             .id;
 
-        self.descendants.get(&child_id).unwrap().get_param_types()
+        self.scopes.get(&child_id).unwrap().get_param_types()
     }
 }
 
