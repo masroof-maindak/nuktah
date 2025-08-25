@@ -60,7 +60,7 @@ cargo build -r
 - [x] **bug**: void type semantic analysis
 - [x] **bug**: parsing of string declarations
 - [x] Add a boolean type
-- [ ] Eliminate `mod.rs` files
+- [x] Eliminate `mod.rs` files
 - [ ] Unit tests
 - [ ] `ir_gen`
 - [ ] `asm_gen` -> ARM? MIPS?
