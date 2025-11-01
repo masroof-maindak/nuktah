@@ -54,28 +54,28 @@ fn generate_function_scope(
 
 fn analyse_block_scope(
     spaghet: &mut SpaghettiStack,
-    curr_id: Id,
+    node_id: Id,
     block: &Block,
 ) -> Result<(), ScopeError> {
     for stmt in block {
         match stmt {
             Stmt::For(f) => {
-                let for_table_id = generate_for_scope(spaghet, curr_id, f)?;
-                spaghet.add_child(curr_id, for_table_id, None);
+                let for_table_id = generate_for_scope(spaghet, node_id, f)?;
+                spaghet.add_child(node_id, for_table_id, None);
             }
 
             Stmt::If(i) => {
-                let if_table_ids = generate_if_scope(spaghet, curr_id, i)?;
-                spaghet.add_child(curr_id, if_table_ids.0, None);
-                spaghet.add_child(curr_id, if_table_ids.1, None);
+                let if_table_ids = generate_if_scope(spaghet, node_id, i)?;
+                spaghet.add_child(node_id, if_table_ids.0, None);
+                spaghet.add_child(node_id, if_table_ids.1, None);
             }
 
             Stmt::Expr(es) | Stmt::Ret(es) => {
-                check_for_undeclared_ident(spaghet, curr_id, &es.expr)?;
+                check_for_undeclared_ident(spaghet, node_id, &es.expr)?;
             }
 
             Stmt::VarDecl(v) => {
-                insert_var_to_scope(spaghet, curr_id, v)?;
+                insert_var_to_scope(spaghet, node_id, v)?;
             }
 
             Stmt::Break => {} // ignore

@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum ScopeError {
-    UndeclaredVariableCalled,
+    UndeclaredVariableAccessed,
     UndefinedFunctionCalled,
     VariableRedefinition,
     FunctionPrototypeRedefinition,
